@@ -1,0 +1,40 @@
+---
+description: General coding standards for all code in this repository (size limits, naming, structure).
+alwaysApply: true
+---
+# General coding standards
+
+## Size limits (hard, checked by scripts)
+| Unit                  | Limit                         |
+|-----------------------|-------------------------------|
+| Any source/test file  | ≤ 200 lines (aim for ≤ 150)   |
+| Function / method     | ≤ 40 lines                    |
+| React component file  | ≤ 150 lines                   |
+| Parameters            | ≤ 4 (else pass an object/model) |
+| Nesting depth         | ≤ 3 (use early returns)       |
+
+Before editing a file: `wc -l <file>`. If your change would exceed the limit, split first:
+- Split by responsibility, not by line number (e.g. `orders_service.py` → `services/orders/create.py`, `cancel.py`).
+- Keep the public import path working if other code imports it (re-export in `__init__.py` / `index.ts`).
+- Exempt: `frontend/src/components/ui/*` (shadcn generated), lock files, files in `.agent/size-allowlist.txt`.
+
+## Structure
+- One responsibility per file. The file name says what it does.
+- Search before writing a helper: `rg -n "def <name>|function <name>|const <name>"`. Reuse, don't duplicate.
+- Follow the existing pattern in the closest similar feature. Consistency beats your preference.
+
+## Naming
+- Python: `snake_case` files/functions/vars, `PascalCase` classes, `UPPER_SNAKE` constants.
+- TypeScript: `PascalCase.tsx` for components, `useThing.ts` for hooks, `camelCase.ts` for other modules.
+- Booleans start with `is/has/can/should`. Functions start with a verb (`get_order`, `cancelOrder`).
+- No unclear abbreviations. Allowed: `id`, `url`, `api`, `db`, `ui`.
+
+## Code hygiene
+- No magic numbers/strings: use named constants or enums.
+- No commented-out code, no `print`, no `console.log`, no `debugger`.
+- `TODO` only with a Jira key: `# TODO(PROJ-123): ...`.
+- Never swallow errors. No bare `except:`; catch specific exceptions; no empty `catch {}`.
+- Config and secrets come from settings/env. Never hardcode URLs, credentials, tokens.
+- Comments explain WHY, not WHAT. Public functions get a one-line docstring/JSDoc.
+- No new dependency unless PLAN.md lists it and the human approved the plan.
+- Imports: absolute, no wildcard (`*`), no circular imports.

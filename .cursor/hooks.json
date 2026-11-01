@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "python3 .cursor/hooks/block_commands.py",
+        "matcher": "git|glab|p4|kubectl|ssh|scp|curl|wget|mysql|mariadb",
+        "timeout": 10,
+        "failClosed": true
+      }
+    ]
+  }
+}

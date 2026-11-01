@@ -1,0 +1,1 @@
+# Protected paths a human approved the agent to change for the current ticket (one per line). Remove after merge.

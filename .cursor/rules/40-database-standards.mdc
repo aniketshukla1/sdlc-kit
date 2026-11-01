@@ -1,0 +1,33 @@
+---
+description: Database standards for MySQL models, Alembic migrations, repositories and Elasticsearch code.
+globs: backend/app/models/**,backend/alembic/**,backend/app/repositories/**,backend/app/search/**
+alwaysApply: false
+---
+# Database standards (MySQL + Alembic + Elasticsearch)
+
+## MySQL schema
+- Tables: plural `snake_case` (`order_items`). Columns: `snake_case`. Foreign keys: `<entity>_id`.
+- Names: index `ix_<table>_<cols>`, unique `uq_<table>_<cols>`, FK `fk_<table>_<col>_<ref>`.
+- Types: `VARCHAR(n)` with explicit n; `DECIMAL(p,s)` for money; `DATETIME` stored as UTC; `BOOLEAN`; utf8mb4.
+- New tables get `id`, `created_at`, `updated_at`.
+- Every foreign key has an index. Columns used in new `WHERE`/`ORDER BY` get an index (note it in the plan).
+
+## Migrations (Alembic)
+- Every schema change = one Alembic migration. Never change tables by hand.
+- Never edit a migration that already exists on `main`. Create a new one instead.
+- `downgrade()` must exactly reverse `upgrade()`, and must be tested.
+- Adding a NOT NULL column to an existing table: use `server_default`, or 3 steps
+  (add nullable → backfill → set NOT NULL). Write which one in the plan.
+- Destructive changes (drop/rename column or table, type narrowing) only if the ticket says so, and never in
+  place: expand/contract. Add the new column, write both, backfill, switch reads; drop the old one in its own
+  later ticket or sub-task, once no code uses it. Mark them as a risk in PLAN.md.
+- Large tables: note the lock/downtime risk in PLAN.md "Risks". Data updates inside a migration run in batches.
+- Never run migrations against staging or production.
+
+## Elasticsearch (only if the project has `app/search/`)
+- MySQL is the source of truth. ES is a copy for search.
+- NEVER change mappings, index settings, analyzers or aliases, and never reindex. Humans only.
+  If the ticket needs it: write the proposal under "Human actions required" in PLAN.md and stop for approval.
+- Queries live only in `app/search/`. Use filter context for exact matches.
+- Always set `size` and pagination. Never request unbounded results.
+- Handle ES being down using the project's existing pattern (log + fallback or 503).

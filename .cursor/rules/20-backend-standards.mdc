@@ -1,0 +1,59 @@
+---
+description: Backend standards for Python + FastAPI + SQLAlchemy code.
+globs: backend/**/*.py
+alwaysApply: false
+---
+# Backend standards (Python + FastAPI)
+
+## Layers (follow the existing layout if it differs; never mix layers)
+| Path                                     | Contains                                  | Must NOT contain        |
+|------------------------------------------|-------------------------------------------|-------------------------|
+| `app/api/v1/routes/<feature>.py`         | HTTP only: parse, call service, return    | SQL, business rules     |
+| `app/schemas/<feature>.py`               | Pydantic v2 request/response models       | DB access               |
+| `app/services/<feature>_service.py`      | Business rules, permissions, transactions | HTTP objects, raw SQL   |
+| `app/repositories/<feature>_repository.py` | SQLAlchemy queries only                 | Business rules          |
+| `app/models/<feature>.py`                | SQLAlchemy ORM models                     | Logic                   |
+| `app/core/`                              | config, db session, errors, security      | Feature code            |
+| `app/search/`                            | Elasticsearch queries (only if used)      | Mapping changes         |
+
+When a layer file nears 200 lines, turn it into a package: `services/orders/{__init__,create,cancel}.py`.
+
+## Routes
+- Declare `response_model` and `status_code` on every endpoint.
+- Get DB session and current user via `Depends(...)` using the project's existing dependencies.
+- Every new route requires auth. A route is public only when the ticket says so; PLAN.md's API table says which.
+- Changing an existing endpoint: only add optional fields. Never rename, remove or retype a field unless the
+  ticket says so; the frontend and other callers depend on it.
+- Match the existing sync/async style. Do not mix in one feature.
+- Status codes: 200 read/update, 201 create, 204 delete, 401 unauthenticated, 403 forbidden,
+  404 not found, 409 duplicate/conflict, 422 validation.
+
+## Schemas
+- Separate `<X>Create`, `<X>Update`, `<X>Read`. Read models: `model_config = ConfigDict(from_attributes=True)`.
+- `Create`/`Update` never accept server-owned fields: `id`, owner/user ids, `role`, `is_admin`, timestamps.
+  The service sets them from the current user or the database.
+- `Update` schemas: every field optional; the service applies only the fields sent (`data.model_dump(exclude_unset=True)`).
+- Put constraints in `Field(...)`: `min_length`, `max_length` (= DB column length), `ge`, `le`, regex.
+- Never return ORM objects directly. Never expose password hashes, tokens or internal flags.
+
+## Services
+- Raise the project's domain errors (find them: `rg -n "class \w+Error" backend/app/core`).
+  Do not raise `HTTPException` in services. If no error classes exist, ask before creating them.
+- Check permissions/ownership here, not only in the UI.
+- Multi-step writes run in ONE transaction; commit in one place; roll back on error.
+- A new cache states its key (including the user or tenant; without it, data leaks between users) and how it
+  goes stale.
+
+## Repositories
+- SQLAlchemy 2.x style: `select(...)`, `session.execute(...)`. No `session.query`.
+- Never build SQL with f-strings or `+`. Use bound parameters only.
+- Avoid N+1: use `selectinload`/`joinedload` for relations used in the response.
+- Every list query is paginated: default limit 20, max 100, offset ≥ 0, stable `order_by`.
+
+## Types, data, logging
+- Full type hints, mypy clean. No `Any` without a comment explaining why.
+- Datetimes are timezone-aware UTC, and Read schemas send them with the zone (`+00:00`). MySQL `DATETIME` gives
+  back naive values: attach UTC in one shared validator or type. Money is `Decimal`, never `float`.
+- `logger = logging.getLogger(__name__)`. Never log passwords, tokens or personal data.
+- Log events, not prose: a stable event name plus fields, in the project's existing style (with its request id
+  if it has one). `error` = someone must act, `warning` = handled degradation, `info` = business event.

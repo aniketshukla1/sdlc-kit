@@ -1,0 +1,1 @@
+# Jira project key for /jira-create, on the next line (e.g. PROJ). Humans edit this file, not the agent.

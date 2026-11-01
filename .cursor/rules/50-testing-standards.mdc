@@ -1,0 +1,40 @@
+---
+description: Testing standards for pytest, Vitest, Playwright and Cypress tests.
+globs: backend/tests/**,frontend/**/*.test.ts,frontend/**/*.test.tsx,frontend/e2e/**,frontend/cypress/**
+alwaysApply: false
+---
+# Testing standards
+
+## General
+- Every acceptance criterion has at least 1 test. Every edge case in PLAN.md has a test or an "N/A: reason".
+- Test names say scenario and result: `test_cancel_order_when_already_shipped_returns_409`.
+- Arrange / Act / Assert, separated by a blank line. One behavior per test.
+- Deterministic: no real network, no real current time (freeze it), no unseeded randomness, no fixed sleeps.
+- Test behaviour (inputs → outputs), not internals. Mock only at boundaries (network, clock, slow services).
+  No large snapshots nobody reads.
+- Assert exact values (status code, fields, message, visible text); never only "not None" or truthy.
+- Code behind a feature flag: test it with the flag on and off.
+- Test files are ≤ 200 lines too. Split by behavior (`test_orders_create.py`, `test_orders_cancel.py`).
+- Reuse fixtures/factories from `conftest.py` and test utils. Don't copy-paste setup.
+
+## Backend (pytest)
+- `backend/tests/unit/<feature>/`: services, with repositories mocked.
+- `backend/tests/integration/<feature>/`: routes through the test client with the test database.
+- Minimum per endpoint: happy path, 422 invalid input, 404 not found, 401/403 auth,
+  409 duplicate (if a unique rule exists), pagination limits (if a list).
+
+## Frontend (Vitest + React Testing Library)
+- Query by role/label/text (`getByRole('button', { name: /save/i })`). Not by class names.
+- Cover: renders data, loading, empty, error, validation messages, successful submit.
+- Mock network the way existing tests do (MSW if present, else mock the api hooks).
+- Type mock API data with the generated API types (`components["schemas"]["<Name>"]`) when `src/api/schema.d.ts`
+  exists, so a backend change breaks the mock at compile time.
+
+## E2E (Playwright or Cypress)
+- Use the framework that already covers this area of the app:
+  `frontend/playwright.config.*` → Playwright; `frontend/cypress.config.*` → Cypress.
+  If both exist, put the test where the closest existing spec for this screen lives.
+- Never add a new framework. Never write the same flow in both.
+- One spec per user-facing acceptance criterion: happy path + the most important failure.
+- Select by role/label; `data-testid` only if no accessible selector exists.
+- Wait for UI state (`expect(...).toBeVisible()`, `cy.contains(...)`), never `waitForTimeout`/`cy.wait(ms)`.
