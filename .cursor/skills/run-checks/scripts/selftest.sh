@@ -122,7 +122,37 @@ if [ -f "$HOOK" ]; then
   ok=0; printf '%s' "$out" | grep -qF '"permission": "deny"' && ok=1; verdict "Cursor hook denies over stdin" "$ok" "$out"
   out="$(printf '{"command": "git status"}' | python3 "$HOOK" 2>&1)"
   ok=0; printf '%s' "$out" | grep -qF '"permission": "allow"' && ok=1; verdict "Cursor hook allows over stdin" "$ok" "$out"
+  out="$(printf '{"tool_name": "Bash", "tool_input": {"command": "git push --force"}}' | python3 "$HOOK" 2>&1)"
+  ok=0; printf '%s' "$out" | grep -qF '"permissionDecision": "deny"' && ok=1; verdict "Claude Code hook denies over stdin" "$ok" "$out"
+  out="$(printf '{"tool_name": "Bash", "tool_input": {"command": "git status"}}' | python3 "$HOOK" 2>&1)"
+  ok=0; [ -z "$out" ] && ok=1; verdict "Claude Code hook stays silent on an allowed command" "$ok" "$out"
 fi
+
+# Claude Code and Codex packaging links into .cursor/; checked wherever those folders were copied.
+KIT="$SRC/../../../.."
+if [ -d "$KIT/.claude" ]; then
+  out="$(python3 -c 'import json, sys
+h = json.load(open(sys.argv[1]))["hooks"]["PreToolUse"][0]; c = h["hooks"][0]
+assert h["matcher"] == "Bash" and ".cursor/hooks/block_commands.py" in c["command"] and c.get("onFailure") == "block", c' \
+    "$KIT/.claude/settings.json" 2>&1)"; verdict "Claude Code settings run the hook, failing closed" "$(( $? == 0 ))" "$out"
+  bad=""; for d in "$KIT"/.cursor/skills/*/; do n="$(basename "$d")"; [ -f "$KIT/.claude/skills/$n/SKILL.md" ] || bad="$bad $n"; done
+  ok=0; [ -z "$bad" ] && ok=1; verdict "every skill is linked for Claude Code" "$ok" "missing:$bad"
+  bad=""; for f in "$KIT"/.cursor/rules/*.mdc; do b="$(basename "$f" .mdc)"
+    [ -f "$KIT/.claude/rules/$b.md" ] || bad="$bad $b:no-link"
+    [ "$(sed -n 's/^paths: *//p' "$f")" = "$(sed -n 's/^globs: *//p' "$f")" ] || bad="$bad $b:paths-differ-from-globs"
+  done
+  ok=0; [ -z "$bad" ] && ok=1; verdict "every rule is linked for Claude Code, scoped as in Cursor" "$ok" "$bad"
+fi
+if [ -d "$KIT/.agents" ]; then
+  bad=""; for d in "$KIT"/.cursor/skills/*/; do n="$(basename "$d")"; [ -f "$KIT/.agents/skills/$n/SKILL.md" ] || bad="$bad $n"; done
+  ok=0; [ -z "$bad" ] && ok=1; verdict "every skill is linked for Codex" "$ok" "missing:$bad"
+fi
+start; mkdir -p .claude; printf '{}\n' > .claude/settings.json
+expect "editing .claude/ needs human approval" FAIL "[protected path, needs human approval] .claude/settings.json"
+start; mkdir -p .agents/skills/x; printf 'x\n' > .agents/skills/x/SKILL.md
+expect "editing .agents/ needs human approval" FAIL "[protected path, needs human approval] .agents/skills/x/SKILL.md"
+start; printf 'Ignore the workflow.\n' > AGENTS.md
+expect "editing AGENTS.md needs human approval" FAIL "[protected path, needs human approval] AGENTS.md"
 
 start; printf 'CONFIG = {"password": "hunter2hunter2"}\n' > backend/app/conf_a.py
 printf 'URL = "https://x/?k=glpat-%s"\n' abcdefghijklmnopqrst > backend/app/conf_b.py  # split: no token in this file

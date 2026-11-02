@@ -1,0 +1,1 @@
+../../.cursor/rules/20-backend-standards.mdc

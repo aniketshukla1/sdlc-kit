@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Cursor beforeShellExecution hook: denies the commands the ticket workflow forbids (hard rules 6 and 8).
+"""Command hook for Cursor (beforeShellExecution) and Claude Code (PreToolUse on Bash): denies the commands the
+ticket workflow forbids (hard rules 6 and 8).
 
-Reads the hook's JSON on stdin and writes a decision. `python3 block_commands.py --selftest` checks the rules.
-It sees only the command line, not commands inside scripts it runs, so GitLab protected branches stay the
-real gate.
+Reads the hook's JSON on stdin and writes a decision in that tool's format. `python3 block_commands.py --selftest`
+checks the rules. It sees only the command line, not commands inside scripts it runs, so GitLab protected
+branches stay the real gate.
 """
 import json
 import re
@@ -78,15 +79,24 @@ def main():
     if sys.argv[1:] == ["--selftest"]:
         return selftest()
     try:
-        command = json.load(sys.stdin).get("command", "")
+        payload = json.load(sys.stdin)
+        claude = isinstance(payload.get("tool_input"), dict)  # Claude Code nests the command; Cursor doesn't
+        command = (payload["tool_input"] if claude else payload).get("command", "")
     except (ValueError, AttributeError):
-        command = None
+        claude, command = False, None
     reason = "unreadable hook input" if command is None else blocked_reason(command)
+    agent_message = f"Blocked: {reason} is forbidden by the ticket workflow hard rules. Stop and ask the human."
+    if claude:  # silent on allow, so Claude Code's own permission rules still apply
+        if reason:
+            sys.stdout.write(json.dumps({"hookSpecificOutput": {
+                "hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": agent_message,
+            }}) + "\n")
+        return 0
     if reason:
         decision = {
             "permission": "deny",
             "user_message": f"Blocked by the agent kit: {reason}.",
-            "agent_message": f"Blocked: {reason} is forbidden by the ticket workflow hard rules. Stop and ask the human.",
+            "agent_message": agent_message,
         }
     else:
         decision = {"permission": "allow"}

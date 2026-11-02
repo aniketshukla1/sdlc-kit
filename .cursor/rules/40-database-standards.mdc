@@ -1,6 +1,7 @@
 ---
 description: Database standards for MySQL models, Alembic migrations, repositories and Elasticsearch code.
 globs: backend/app/models/**,backend/alembic/**,backend/app/repositories/**,backend/app/search/**
+paths: backend/app/models/**,backend/alembic/**,backend/app/repositories/**,backend/app/search/**
 alwaysApply: false
 ---
 # Database standards (MySQL + Alembic + Elasticsearch)

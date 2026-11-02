@@ -1,6 +1,7 @@
 ---
 description: Frontend standards for React + TypeScript + Tailwind CSS + shadcn/ui code.
 globs: frontend/**/*.ts,frontend/**/*.tsx
+paths: frontend/**/*.ts,frontend/**/*.tsx
 alwaysApply: false
 ---
 # Frontend standards (React + TypeScript + Tailwind + shadcn/ui)

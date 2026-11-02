@@ -1,0 +1,1 @@
+../../.cursor/rules/10-general-standards.mdc

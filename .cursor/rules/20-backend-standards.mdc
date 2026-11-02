@@ -1,6 +1,7 @@
 ---
 description: Backend standards for Python + FastAPI + SQLAlchemy code.
 globs: backend/**/*.py
+paths: backend/**/*.py
 alwaysApply: false
 ---
 # Backend standards (Python + FastAPI)

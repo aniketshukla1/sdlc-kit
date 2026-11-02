@@ -19,7 +19,7 @@ TEST_DEF='^[[:space:]]*((async[[:space:]]+)?def[[:space:]]+test|(it|test)\()'
 # Unfinished work in source files. An abstract method uses @abstractmethod with `...`, not NotImplementedError.
 STUB='raise[[:space:]]+NotImplementedError|new[[:space:]]+Error\(["'"'"'`][Nn]ot implemented|except[^:]*:[[:space:]]*pass\b|catch[[:space:]]*(\([^)]*\))?[[:space:]]*\{[[:space:]]*\}'
 SECRET='AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY|glpat-[0-9A-Za-z_-]{20,}|(password|passwd|secret|api_key|apikey|token)["'"'"']?[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']{8,}["'"'"']'
-PROTECTED='(^|/)\.env($|\.)|docker-compose\.(staging|stage|prod|production)|(^|/)\.gitlab-ci\.yml$|(^|/)\.cursor/|(^|/)search/.*(mapping|index_settings|alias)|mappings?[^/]*\.json$|(^|/)\.p4'
+PROTECTED='(^|/)\.env($|\.)|docker-compose\.(staging|stage|prod|production)|(^|/)\.gitlab-ci\.yml$|(^|/)\.(cursor|claude|agents)/|(^|/)AGENTS\.md$|(^|/)search/.*(mapping|index_settings|alias)|mappings?[^/]*\.json$|(^|/)\.p4'
 # Lint/type/test config: weakening any of these can turn a failing check green.
 CONFIG='(^|/)(pyproject\.toml|setup\.cfg|pytest\.ini|tox\.ini|\.?ruff\.toml|\.?mypy\.ini|\.eslintignore|alembic\.ini)$|(^|/)tsconfig[^/]*\.json$|eslint\.config|\.eslintrc|(^|/)(vite|vitest|playwright|cypress)\.config\.|(^|/)alembic/env\.py$'
 DEPS='(^|/)(package\.json|requirements[^/]*\.txt)$'

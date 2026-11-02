@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sdlc-kit: make your AI coding agent prove it's done</title>
-<meta name="description" content="sdlc-kit is an open-source Cursor kit that takes a Jira ticket to a reviewed GitLab merge request. The agent plans first, writes failing tests first, and can't call it done until real check scripts agree.">
+<meta name="description" content="sdlc-kit is an open-source kit for Cursor, Claude Code and Codex that takes a Jira ticket to a reviewed GitLab merge request. The agent plans first, writes failing tests first, and can't call it done until real check scripts agree.">
 <meta name="theme-color" content="#0A0B0D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="sdlc-kit">
@@ -339,7 +339,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
 <section class="hero grid-bg" aria-labelledby="hero-h">
   <div class="wrap">
     <div>
-      <p class="eyebrow"><i class="dot" aria-hidden="true"></i>Open source · MIT <span class="sep" aria-hidden="true">/</span> Cursor + Jira + GitLab</p>
+      <p class="eyebrow"><i class="dot" aria-hidden="true"></i>Open source · MIT <span class="sep" aria-hidden="true">/</span> Cursor · Claude Code · Codex <span class="sep" aria-hidden="true">/</span> Jira + GitLab</p>
       <h1 id="hero-h">Your AI agent says it's done. <span class="ok">Make it prove it.</span></h1>
       <p class="lede">sdlc-kit takes a Jira ticket to a reviewed GitLab merge request. The agent plans before it codes, writes failing tests first, and can't say "done" until real check scripts agree.</p>
       <div class="install">
@@ -353,7 +353,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
       <ul class="facts" aria-label="At a glance">
         <li><b>15</b> skills</li>
         <li><b>12</b> hook rules</li>
-        <li><b>57</b> self-tests</li>
+        <li><b>66</b> self-tests</li>
       </ul>
     </div>
 
@@ -413,7 +413,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <p class="say"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><span class="sr">The agent says: </span><q>I'll just force-push.</q></span></p>
         <div class="kit">
           <h3><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>A hook says no before it runs</h3>
-          <p>No force push, no merge, no wiping your uncommitted work, no remote servers. A Cursor hook denies those commands before they run.</p>
+          <p>No force push, no merge, no wiping your uncommitted work, no remote servers. A command hook denies those commands before they run.</p>
         </div>
       </li>
       <li class="reveal">
@@ -523,7 +523,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>Migrations reverse cleanly, one head, no drift; never edit one already on <code>main</code></p><span class="by">check_migration.sh · check_guards.sh</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>Tests and migrations only touch a local database</p><span class="by">db_guard.sh</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>Files ≤ 200 lines, React components ≤ 150</p><span class="by">check_size.sh</span></li>
-        <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>No force push, merge, <code>reset --hard</code>, <code>ssh</code> or <code>kubectl</code>; network only to localhost</p><span class="by">Cursor hook · block_commands.py</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>No force push, merge, <code>reset --hard</code>, <code>ssh</code> or <code>kubectl</code>; network only to localhost</p><span class="by">command hook · block_commands.py</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>The MR carries its proof: <code>ALL PASS</code> on exactly the commit under review, the logged red lines, the changed files</p><span class="by">proof_pack.sh</span></li>
       </ul>
       <p class="note">The same guards catch deleted or skipped tests, weakened lint and test config, secrets, edits to migrations already on main, stubs left over from test-first, and swallowed errors.</p>
@@ -586,7 +586,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
       <p class="sub">The checks are what make the kit trustworthy, so they're tested too.</p>
     </header>
     <ul class="nums">
-      <li class="reveal"><b>57</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
+      <li class="reveal"><b>66</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
       <li class="reveal"><b>7</b><h3>Holes found, all fixed</h3><p>The first version printed ALL PASS on bad changes in 7 ways. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/audit.md">Read the audit</a></p></li>
       <li class="reveal"><b>25</b><h3>Skills reviewed</h3><p>Every one of Addy Osmani's agent-skills compared with the kit. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/skills-gap-review.md">Read the review</a></p></li>
       <li class="reveal"><b>12</b><h3>Hook rules</h3><p>Risky commands are denied before they run, not flagged after.</p></li>
@@ -599,7 +599,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
     <header class="head stick reveal">
       <p class="idx"><b>07</b>Quick start</p>
       <h2 id="q-h">Five minutes to your first ticket</h2>
-      <p class="sub">You need Cursor, GitLab with <code>glab</code>, a Jira MCP server, <code>git</code>, <code>python3</code> and <code>ripgrep</code>. The standards target FastAPI + React; other stacks mostly mean editing paths.</p>
+      <p class="sub">You need Cursor, Claude Code or Codex, GitLab with <code>glab</code>, a Jira MCP server, <code>git</code>, <code>python3</code> and <code>ripgrep</code>. The standards target FastAPI + React; other stacks mostly mean editing paths.</p>
     </header>
     <ol class="qs">
       <li class="reveal">
@@ -607,15 +607,17 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <p>Then commit it through a normal MR.</p>
         <div class="code"><pre><code>git clone https://github.com/aniketshukla1/sdlc-kit.git
 cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/
+cp -r sdlc-kit/.claude path/to/your-repo/                    # Claude Code only
+cp -r sdlc-kit/.agents sdlc-kit/AGENTS.md path/to/your-repo/ # Codex only
 chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button class="copy" type="button" data-copy aria-label="Copy the install commands"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
       </li>
       <li class="reveal">
         <h3>Connect your tools</h3>
-        <p>Run <code>glab auth login</code>, add your Jira MCP server in Cursor (Settings → MCP), and put your Jira project key in <code>.agent/jira-project.txt</code>.</p>
+        <p>Run <code>glab auth login</code>, add your Jira MCP server to your agent, and put your Jira project key in <code>.agent/jira-project.txt</code>.</p>
       </li>
       <li class="reveal">
         <h3>Trust the workspace</h3>
-        <p>Trust it in Cursor, then prove the hook works: ask the agent to run <code>git push --force --dry-run</code>. It must be blocked.</p>
+        <p>Trust it when your agent asks, then prove the hook works: ask the agent to run <code>git push --force --dry-run</code>. It must be blocked. Codex has no hook yet; GitLab's protected branches are its gate.</p>
       </li>
       <li class="reveal">
         <h3>Check the checks</h3>
@@ -623,7 +625,7 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
       </li>
       <li class="reveal">
         <h3>Start a ticket</h3>
-        <p>In Cursor's agent chat:</p>
+        <p>In your agent's chat:</p>
         <div class="code"><pre><code>Start ticket PROJ-123. Follow the ticket workflow rule.</code></pre><button class="copy" type="button" data-copy aria-label="Copy the starting prompt"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
       </li>
     </ol>
@@ -642,8 +644,8 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
         <p>No. The hook denies merge, approve and force push, and blocks <code>kubectl</code>, <code>ssh</code>, <code>p4</code>, and network tools aimed at anything but localhost. The database checks refuse any host that isn't local, and GitLab's protected branches stay the final gate.</p></details>
       <details><summary>Does it burn a lot of tokens?</summary>
         <p>Less than one big prompt. A bug is one chat. Skills load only in their phase and standards only for matching files, so the context stays small where the work is small.</p></details>
-      <details><summary>Does it work with Claude Code, Copilot or Windsurf?</summary>
-        <p>It's built for Cursor. The rules and skills are plain Markdown and the checks are plain shell, so they port; the hook is Cursor-specific. Packaging for other agents is on the roadmap.</p></details>
+      <details><summary>Does it work with Claude Code, Codex or Copilot?</summary>
+        <p>Cursor, Claude Code and Codex are supported. Claude Code gets the same rules, the 15 skills as slash commands and the same command hook. Codex reads <code>AGENTS.md</code> and the skills; it has no command hook yet, so GitLab's protected branches are its gate. Other agents can follow <code>AGENTS.md</code>: everything is plain Markdown and shell.</p></details>
       <details><summary>GitHub instead of GitLab? Linear instead of Jira?</summary>
         <p>Not yet. Both are on the roadmap, and pull requests are welcome.</p></details>
       <details><summary>My stack isn't FastAPI + React.</summary>

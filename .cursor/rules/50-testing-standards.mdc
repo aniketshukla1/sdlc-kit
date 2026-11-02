@@ -1,6 +1,7 @@
 ---
 description: Testing standards for pytest, Vitest, Playwright and Cypress tests.
 globs: backend/tests/**,frontend/**/*.test.ts,frontend/**/*.test.tsx,frontend/e2e/**,frontend/cypress/**
+paths: backend/tests/**,frontend/**/*.test.ts,frontend/**/*.test.tsx,frontend/e2e/**,frontend/cypress/**
 alwaysApply: false
 ---
 # Testing standards

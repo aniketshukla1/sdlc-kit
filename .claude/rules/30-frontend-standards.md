@@ -1,0 +1,1 @@
+../../.cursor/rules/30-frontend-standards.mdc

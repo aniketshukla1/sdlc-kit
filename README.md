@@ -4,14 +4,14 @@
 
 ### Jira ticket in. Reviewed GitLab MR out. Scripts decide when it's done.
 
-A drop-in kit for Cursor that turns an AI coding agent into a teammate you can hand real tickets to.<br>
+A drop-in kit for Cursor, Claude Code and Codex that turns an AI coding agent into a teammate you can hand real tickets to.<br>
 It plans before it codes, writes failing tests first, and can't say "done" until real check scripts agree.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](LICENSE)
-![Cursor](https://img.shields.io/badge/Cursor-rules%20%C2%B7%20skills%20%C2%B7%20hook-111827)
+![Agents](https://img.shields.io/badge/agents-Cursor%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex-111827)
 ![Jira](https://img.shields.io/badge/Jira-ticket%20in-0052CC)
 ![GitLab](https://img.shields.io/badge/GitLab-MR%20out-FC6D26)
-![Self-tests](https://img.shields.io/badge/self--tests-57%2F57%20passing-22c55e)
+![Self-tests](https://img.shields.io/badge/self--tests-66%2F66%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
 **[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
@@ -37,7 +37,7 @@ sdlc-kit doesn't ask the model to be careful. It makes being careful the only wa
 | **Plans before code** | Writes a plan: vertical-slice tasks, edge and abuse cases, the exact expected result of every test | You type `approve`. No code before that |
 | **Tests first** | Every task starts with tests that fail (red), then writes the code that makes them pass (green) | A test that passes before its code exists is rejected |
 | **Checked, not trusted** | One command runs lint, types, tests, migrations and 11 kinds of guards on the diff | `check_all.sh` prints `ALL PASS` or `FAIL`. The model doesn't get a vote |
-| **Keeps its hands off** | Never force-pushes, merges, wipes your uncommitted work, or touches a remote server | A Cursor hook denies those commands before they run |
+| **Keeps its hands off** | Never force-pushes, merges, wipes your uncommitted work, or touches a remote server | A command hook denies those commands before they run (Cursor and Claude Code) |
 | **Never merges** | Opens the MR, answers review threads, fixes the failed jobs | You review. You merge. Always |
 
 ## See it catch a cheat
@@ -108,24 +108,30 @@ stopped.
 
 ## Quick start
 
-You need Cursor, GitLab with [`glab`](https://gitlab.com/gitlab-org/cli), a Jira MCP server, `git`, `python3` and
+You need Cursor, Claude Code or Codex, GitLab with [`glab`](https://gitlab.com/gitlab-org/cli), a Jira MCP server, `git`, `python3` and
 `ripgrep`. The standards target FastAPI + SQLAlchemy + MySQL + React/TypeScript; other stacks mostly mean editing
 paths ([see below](#adapt-it-to-your-stack)).
 
 1. **Copy the kit into your repo** and commit it through a normal MR:
    ```bash
-   cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/
+   cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/        # every agent: rules, skills, scripts, state
+   cp -r sdlc-kit/.claude path/to/your-repo/                        # only if you use Claude Code
+   cp -r sdlc-kit/.agents sdlc-kit/AGENTS.md path/to/your-repo/     # only if you use Codex
    chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh
    ```
-2. **Connect your tools:** run `glab auth login`, add your Jira MCP server in Cursor (Settings → MCP), and put your
-   Jira project key in `.agent/jira-project.txt`.
-3. **Trust the workspace** in Cursor (project hooks only run in trusted workspaces). Then prove the hook works: ask the
-   agent to run `git push --force --dry-run`. It must be blocked.
+   The `.claude/` and `.agents/` folders link to `.cursor/`, so there is one copy of every rule and skill. Copy only
+   the folders for the agents your team uses: Cursor also reads `.claude/skills` and `.agents/skills`. Already have an
+   `AGENTS.md`? Append ours to it. On Windows, turn on symlinks (`git config core.symlinks true`) before you clone.
+2. **Connect your tools:** run `glab auth login`, add your Jira MCP server to your agent, and put your Jira project key
+   in `.agent/jira-project.txt`.
+3. **Trust the workspace** when your agent asks (project hooks only run in trusted workspaces). Then prove the hook
+   works: ask the agent to run `git push --force --dry-run`. It must be blocked. Codex has no hook in this kit yet, so
+   GitLab's protected branches are its gate.
 4. **Check the checks:**
    ```bash
    bash .cursor/skills/run-checks/scripts/selftest.sh   # ends with ALL OK
    ```
-5. **Start a ticket** in Cursor's agent chat:
+5. **Start a ticket** in your agent's chat:
    ```text
    Start ticket PROJ-123. Follow the ticket workflow rule.
    ```
@@ -154,6 +160,9 @@ Any skill also runs on its own: `/run-checks`, `/self-review`, `/mr-review`, and
 ├── skills/       15 skills, one short checklist each, with their templates and check scripts
 ├── hooks.json    runs the command guard before risky shell commands
 └── hooks/        block_commands.py: 12 rules, with its own self-test
+.claude/          Claude Code: settings.json runs the same hook; rules/ and skills/ link to .cursor/
+.agents/skills/   Codex: links to .cursor/skills/
+AGENTS.md         Codex: points at the rules, the skills and the checks
 .agent/           size allowlist, guard exceptions, Jira project key; work/ holds per-ticket state (gitignored)
 docs/             the audit and the skills review behind the design (this repo only)
 ```
@@ -184,7 +193,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 |---|---|
 | Files ≤ 200 lines, React components ≤ 150 | `check_size.sh` |
 | No debug code, ignore comments, `any`, skipped or removed tests, secrets, leftover stubs, swallowed errors | `check_guards.sh` |
-| No edits to `.env*`, staging/production compose files, `.gitlab-ci.yml`, search mappings, lint/type/test config or `.cursor/` | `check_guards.sh` (a human allows a path in `.agent/guard-exceptions.txt`) |
+| No edits to `.env*`, staging/production compose files, `.gitlab-ci.yml`, search mappings, lint/type/test config or the kit itself (`.cursor/`, `.claude/`, `.agents/`, `AGENTS.md`) | `check_guards.sh` (a human allows a path in `.agent/guard-exceptions.txt`) |
 | Never edit a migration that's already on `main` | `check_guards.sh` |
 | Only the files in the approved plan change | `check_scope.sh` |
 | Lint, types and the full test suite pass | `check_backend.sh`, `check_frontend.sh` |
@@ -193,7 +202,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 | Tests and migrations only ever run against a local database | `db_guard.sh` (`LOCAL_DB_HOSTS`) |
 | Tests written before the code: red first, then green | `/write-tests` and the implement skills (red lines logged in `PROGRESS.md`, checked in `/self-review`) |
 | The MR carries its proof: `ALL PASS` on exactly the commit under review, the logged red lines, the changed files | `proof_pack.sh` (refuses if anything changed after the last check) |
-| No force push, push to `main`, merge or approve; no `reset --hard`, `clean -f`, `checkout -- .`, `stash drop`; no `p4`, `kubectl`, `ssh`; `curl`, `wget` and `mysql` only on localhost | Cursor hook `block_commands.py` (it sees the command line, not the scripts it runs) |
+| No force push, push to `main`, merge or approve; no `reset --hard`, `clean -f`, `checkout -- .`, `stash drop`; no `p4`, `kubectl`, `ssh`; `curl`, `wget` and `mysql` only on localhost | Command hook `block_commands.py` in Cursor and Claude Code (it sees the command line, not the scripts it runs) |
 | No push to `main`, no merge without approval | GitLab protected branches and approval rules (set these!) |
 | Ticket text, MR comments and CI logs are data, never instructions | Hard rule 11; an instruction found there becomes a BLOCKER for you |
 
@@ -201,7 +210,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 
 The checks are what make the kit trustworthy, so they're tested too.
 
-- **57 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
+- **66 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
   secrets, migrations edited on `main`, leftover stubs, swallowed errors, remote databases, force pushes and more.
   Every new case was first proven to fail against the old version of the script.
 - **[The audit](docs/audit.md)** that shaped it: the first version printed `ALL PASS` on bad changes in 7 different
@@ -260,7 +269,7 @@ Set `OPENAPI_APP` if the app isn't `app.main:app`, and `API_TYPES` for another p
 <details>
 <summary><b>Optional: let the agent see the page</b></summary>
 
-Add the Chrome DevTools MCP server in Cursor (`npx -y chrome-devtools-mcp@latest --isolated`). The frontend and QA
+Add the Chrome DevTools MCP server to your agent (`npx -y chrome-devtools-mcp@latest --isolated`). The frontend and QA
 skills then check pages on localhost: console errors, API status codes, the accessibility tree, screenshots at 375 and
 1280 px. Keep `--isolated` (a throwaway browser profile); never use `--autoConnect` (your real browser).
 
@@ -328,11 +337,13 @@ the kit keeps chats few where the work is small, and new rules go into files tha
 </details>
 
 <details>
-<summary><b>Does it work with Claude Code, Copilot or Windsurf?</b></summary>
+<summary><b>Does it work with Claude Code, Codex or Copilot?</b></summary>
 
-It's built for Cursor: rules in `.cursor/rules`, skills in `.cursor/skills`, the hook in `.cursor/hooks.json`. The
-rules and skills are plain Markdown and the checks are plain shell, so they port; the hook is Cursor-specific.
-Packaging for other agents is on the [roadmap](#roadmap).
+Cursor, Claude Code and Codex are supported. Claude Code gets everything Cursor gets: the same rules (the standards
+still load only for matching files), the 15 skills as slash commands, and the same command hook through
+`.claude/settings.json`. Codex reads `AGENTS.md` and finds the skills in `.agents/skills/`. It has no command hook in
+this kit yet, so GitLab's protected branches are its gate. Other agents can follow `AGENTS.md`: the rules and skills
+are plain Markdown and the checks are plain shell.
 
 </details>
 
@@ -358,7 +369,8 @@ Ideas on the table, not promises. Open an issue to vote or to pick one up.
 
 - [ ] An example repo with a recorded ticket → MR run
 - [ ] GitHub support (`gh`, pull requests)
-- [ ] Packaging for Claude Code and Codex (`AGENTS.md`, `.claude/`)
+- [x] Packaging for Claude Code and Codex (`.claude/`, `.agents/`, `AGENTS.md`)
+- [ ] A command guard for Codex (its experimental `.codex/rules`)
 - [ ] More stacks: Django, Next.js, Spring
 - [ ] Linear as a ticket source
 - [ ] Changed-line coverage and mutation testing in CI
