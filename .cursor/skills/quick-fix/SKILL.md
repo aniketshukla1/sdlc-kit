@@ -10,6 +10,7 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
 
 ## Part 1: reproduce and propose (no fix code yet)
 1. Fetch the ticket (the tracker's MCP): summary, description, comments, type; for a Sub-task also its parent ticket.
+   A `CHAT-<n>` key: read `.agent/work/<KEY>/TICKET.md`.
    Verify: you have the real text. If the fetch fails, STOP and tell the human. Never guess ticket content.
    A Sub-task whose parent has `.agent/work/<PARENT>/PLAN.md` is part of that roadmap: STOP and tell the
    human to type `Continue <PARENT>`.

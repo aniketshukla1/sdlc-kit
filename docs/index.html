@@ -351,9 +351,9 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <a class="btn btn-ghost" href="https://github.com/aniketshukla1/sdlc-kit"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-gh"/></svg>Star on GitHub</a>
       </div>
       <ul class="facts" aria-label="At a glance">
-        <li><b>15</b> skills</li>
+        <li><b>16</b> skills</li>
         <li><b>12</b> hook rules</li>
-        <li><b>77</b> self-tests</li>
+        <li><b>83</b> self-tests</li>
       </ul>
     </div>
 
@@ -535,7 +535,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
   <div class="wrap">
     <header class="head reveal">
       <p class="idx"><b>05</b>What's inside</p>
-      <h2 id="s-h">15 skills, one short checklist each</h2>
+      <h2 id="s-h">16 skills, one short checklist each</h2>
       <p class="sub">Long instructions make cheaper models skip steps. Each skill loads only in its phase, and each standards file only when a matching file is edited.</p>
     </header>
     <div class="skills">
@@ -569,6 +569,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <h3 id="sg-more">Shortcuts and teammates <span>any time</span></h3>
         <dl>
           <div><dt>quick-fix</dt><dd>The whole quick track in one chat.</dd></div>
+          <div><dt>chat</dt><dd>No ticket? A request typed in chat becomes a local ticket with testable criteria, then the normal track.</dd></div>
           <div><dt>jira-create</dt><dd>A detailed Jira or Linear ticket from one sentence, using your team's templates.</dd></div>
           <div><dt>mr-review</dt><dd>Reviews any MR against its ticket; posts labelled threads only after you type <code>post</code>.</dd></div>
           <div><dt>ticket-qa</dt><dd>A pass/fail QA plan from the acceptance criteria, with evidence.</dd></div>
@@ -586,7 +587,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
       <p class="sub">The checks are what make the kit trustworthy, so they're tested too.</p>
     </header>
     <ul class="nums">
-      <li class="reveal"><b>77</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
+      <li class="reveal"><b>83</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
       <li class="reveal"><b>7</b><h3>Holes found, all fixed</h3><p>The first version printed ALL PASS on bad changes in 7 ways. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/audit.md">Read the audit</a></p></li>
       <li class="reveal"><b>25</b><h3>Skills reviewed</h3><p>Every one of Addy Osmani's agent-skills compared with the kit. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/skills-gap-review.md">Read the review</a></p></li>
       <li class="reveal"><b>12</b><h3>Hook rules</h3><p>Risky commands are denied before they run, not flagged after.</p></li>
@@ -603,25 +604,23 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
     </header>
     <ol class="qs">
       <li class="reveal">
-        <h3>Copy the kit into your repo</h3>
-        <p>Then commit it through a normal MR.</p>
+        <h3>Install it into your repo</h3>
+        <p>It never overwrites your files, adds Claude Code or Codex when your repo uses them, and ends with a checklist. Linear: add <code>--tracker linear</code>.</p>
         <div class="code"><pre><code>git clone https://github.com/aniketshukla1/sdlc-kit.git
-cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/
-cp -r sdlc-kit/.claude path/to/your-repo/                    # Claude Code only
-cp -r sdlc-kit/.agents sdlc-kit/AGENTS.md path/to/your-repo/ # Codex only
-chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button class="copy" type="button" data-copy aria-label="Copy the install commands"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
+bash sdlc-kit/install.sh path/to/your-repo --key PROJ</code></pre><button class="copy" type="button" data-copy aria-label="Copy the install commands"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
       </li>
       <li class="reveal">
         <h3>Connect your tools</h3>
-        <p>Run <code>glab auth login</code> or <code>gh auth login</code>, add your Jira or Linear MCP server to your agent, and put your project key in <code>.agent/jira-project.txt</code> (Linear: your team key, and <code>linear</code> in <code>.agent/tracker.txt</code>). The kit reads GitLab or GitHub from your <code>origin</code> remote.</p>
+        <p>Run <code>glab auth login</code> or <code>gh auth login</code>, and add your Jira or Linear MCP server to your agent. The kit reads GitLab or GitHub from your <code>origin</code> remote.</p>
       </li>
       <li class="reveal">
         <h3>Trust the workspace</h3>
         <p>Trust it when your agent asks, then prove the hook works: ask the agent to run <code>git push --force --dry-run</code>. It must be blocked. Codex has no hook yet; your protected branches are its gate.</p>
       </li>
       <li class="reveal">
-        <h3>Check the checks</h3>
-        <div class="code"><pre><code>bash .cursor/skills/run-checks/scripts/selftest.sh</code></pre><button class="copy" type="button" data-copy aria-label="Copy the self-test command"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
+        <h3>Commit the kit</h3>
+        <p>Through a normal MR. Rerun the checklist any time:</p>
+        <div class="code"><pre><code>bash .cursor/skills/run-checks/scripts/doctor.sh</code></pre><button class="copy" type="button" data-copy aria-label="Copy the checklist command"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button></div>
       </li>
       <li class="reveal">
         <h3>Start a ticket</h3>
@@ -645,7 +644,9 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
       <details><summary>Does it burn a lot of tokens?</summary>
         <p>Less than one big prompt. A bug is one chat. Skills load only in their phase and standards only for matching files, so the context stays small where the work is small.</p></details>
       <details><summary>Does it work with Claude Code, Codex or Copilot?</summary>
-        <p>Cursor, Claude Code and Codex are supported. Claude Code gets the same rules, the 15 skills as slash commands and the same command hook. Codex reads <code>AGENTS.md</code> and the skills; it has no command hook yet, so your protected branches are its gate. Other agents can follow <code>AGENTS.md</code>: everything is plain Markdown and shell.</p></details>
+        <p>Cursor, Claude Code and Codex are supported. Claude Code gets the same rules, the 16 skills as slash commands and the same command hook. Codex reads <code>AGENTS.md</code> and the skills; it has no command hook yet, so your protected branches are its gate. Other agents can follow <code>AGENTS.md</code>: everything is plain Markdown and shell.</p></details>
+      <details><summary>Do I need Jira or Linear?</summary>
+        <p>No. Type the request with <code>/chat</code>: it drafts a local ticket with testable acceptance criteria and a <code>CHAT-&lt;n&gt;</code> key, you type <code>start</code>, and the same tracks, tests and checks run. The MR quotes the request, so reviewers still see what was asked.</p></details>
       <details><summary>GitHub instead of GitLab? Linear instead of Jira?</summary>
         <p>GitHub works: the kit reads the host from your <code>origin</code> remote and does every MR step through <code>gh</code>, with pull requests, checks and review threads. Linear works too: write <code>linear</code> in <code>.agent/tracker.txt</code>; a <code>Bug</code> label or a sub-issue takes the quick track.</p></details>
       <details><summary>My stack isn't FastAPI + React.</summary>

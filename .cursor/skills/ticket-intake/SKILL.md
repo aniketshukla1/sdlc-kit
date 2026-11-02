@@ -6,7 +6,7 @@ description: Phase 1 of the full track (Story, New Feature, Improvement, Enhance
 
 ## Steps
 1. Fetch the issue with the tracker's MCP tool: summary (Linear: title), description, acceptance criteria,
-   comments, linked issues, issue type (Linear: labels).
+   comments, linked issues, issue type (Linear: labels). A `CHAT-<n>` key: read `.agent/work/<KEY>/TICKET.md`.
    Verify: you have the real text. If the fetch fails, STOP and tell the human. Never guess ticket content.
    Then fetch each of its sub-tasks (Linear: sub-issues) the same way. Open ones get planned; list Done/closed ones as already done.
 2. Create `.agent/work/<KEY>/REQUIREMENTS.md` from the template below.

@@ -10,7 +10,7 @@ You run things locally only. Testing, Staging and Production are for the human (
 ## Steps
 1. Fetch the ticket (the tracker's MCP): acceptance criteria and comments (a sub-task: also its parent). Find its MR
    (`bash .cursor/skills/mr-feedback/scripts/mr.sh find <KEY>`, the title starting with `<KEY>:`) and read the
-   MR's AC table.
+   MR's AC table. A `CHAT-<n>` key has no ticket: the MR's Ticket section and AC table are the requirements.
 2. Write `.agent/work/<KEY>/QA.md` from `qa-template.md` (next to this file):
    - One row per check, as Given / When / Then with one action and one visible result. Mark must-pass rows.
    - Fill every Coverage line. One that doesn't apply: `N/A: <why>`. Never leave one out.

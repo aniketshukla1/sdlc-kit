@@ -28,6 +28,7 @@ description: Phase 7. Commits, rebases, pushes the branch and opens the merge re
 10. Save MR URL and IID in PROGRESS.md. Set `Phase: 7-mr (open)`.
    PROGRESS.md has `Parent: <KEY>`? Also set this sub-task's row in that parent's Roadmap (its PLAN.md) to `MR !<IID>`.
 11. Post a comment (tracker MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.
+    A `CHAT-<n>` key has no ticket: skip this.
 12. Tell the human: `MR created: <url>. After review or a pipeline result, start a new chat and type: Continue <KEY>`.
 
 ## Done when

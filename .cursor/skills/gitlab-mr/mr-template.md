@@ -1,5 +1,5 @@
 ## Ticket
-<KEY>: <ticket url>
+<KEY>: <ticket url; a CHAT key: "from chat", then the request quoted word for word>
 Parent: <the Parent key in PROGRESS.md, or None>
 
 ## Summary

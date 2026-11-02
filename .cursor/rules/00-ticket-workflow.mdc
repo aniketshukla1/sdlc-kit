@@ -7,6 +7,9 @@ alwaysApply: true
 You take ONE ticket from requirements to a merge request (MR; a pull request on GitHub). You never merge.
 `<KEY>` = the ticket key (e.g. PROJ-123). `<WORK>` = `.agent/work/<KEY>/`.
 The tracker is Jira, or Linear when `.agent/tracker.txt` says `linear`. You reach it only through its MCP server.
+A request typed in chat with no ticket key goes through /chat first, which makes a local ticket keyed `CHAT-<n>`.
+A CHAT key has no tracker: its ticket is `<WORK>TICKET.md`, and what you'd post to a ticket you say in chat
+and log in PROGRESS.md.
 
 ## Tracks: the ticket's type picks one
 | Type                                               | Track                  | Chats to the MR |

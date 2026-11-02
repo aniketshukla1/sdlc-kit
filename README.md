@@ -11,7 +11,7 @@ It plans before it codes, writes failing tests first, and can't say "done" until
 ![Agents](https://img.shields.io/badge/agents-Cursor%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex-111827)
 ![Ticket in](https://img.shields.io/badge/ticket%20in-Jira%20%C2%B7%20Linear-0052CC)
 ![MR out](https://img.shields.io/badge/MR%20out-GitLab%20%C2%B7%20GitHub-FC6D26)
-![Self-tests](https://img.shields.io/badge/self--tests-77%2F77%20passing-22c55e)
+![Self-tests](https://img.shields.io/badge/self--tests-83%2F83%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
 **[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
@@ -114,37 +114,52 @@ You need Cursor, Claude Code or Codex, GitLab with [`glab`](https://gitlab.com/g
 `ripgrep`. The standards target FastAPI + SQLAlchemy + MySQL + React/TypeScript; other stacks mostly mean editing
 paths ([see below](#adapt-it-to-your-stack)).
 
-1. **Copy the kit into your repo** and commit it through a normal MR:
+1. **Install it** into your repo. It never overwrites a file that's already there, and it ends with a checklist:
    ```bash
-   cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/        # every agent: rules, skills, scripts, state
-   cp -r sdlc-kit/.claude path/to/your-repo/                        # only if you use Claude Code
-   cp -r sdlc-kit/.agents sdlc-kit/AGENTS.md path/to/your-repo/     # only if you use Codex
-   chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh
+   git clone https://github.com/aniketshukla1/sdlc-kit.git
+   bash sdlc-kit/install.sh path/to/your-repo --key PROJ
    ```
-   The `.claude/` and `.agents/` folders link to `.cursor/`, so there is one copy of every rule and skill. Copy only
-   the folders for the agents your team uses: Cursor also reads `.claude/skills` and `.agents/skills`. Already have an
-   `AGENTS.md`? Append ours to it. On Windows, turn on symlinks (`git config core.symlinks true`) before you clone.
+   It sets up Cursor's files, and Claude Code's or Codex's too when your repo already uses them (or pass
+   `--agent claude`, `--agent codex`). On Linear, add `--tracker linear` and use your team key. The MR host comes from
+   your `origin` remote (`--host github` overrides it). An existing `hooks.json`, `.claude/settings.json` or
+   `AGENTS.md` gets the kit's part merged in. The checklist covers your tools, your `glab` or `gh` login, the command
+   hook and the self-tests. Run it again any time: `bash .cursor/skills/run-checks/scripts/doctor.sh`.
+   On Windows, turn on symlinks (`git config core.symlinks true`) before you clone.
 2. **Connect your tools:** run `glab auth login` (GitHub: `gh auth login`) and add your tracker's MCP server to your
-   agent (Linear's is `https://mcp.linear.app/mcp`). Put your Jira project key, or Linear team key, in
-   `.agent/jira-project.txt`; on Linear, also write `linear` in `.agent/tracker.txt`. The kit reads GitLab or GitHub
-   from your `origin` remote; if that's wrong, write `gitlab` or `github` in `.agent/git-host.txt`.
+   agent (Linear's is `https://mcp.linear.app/mcp`).
 3. **Trust the workspace** when your agent asks (project hooks only run in trusted workspaces). Then prove the hook
    works: ask the agent to run `git push --force --dry-run`. It must be blocked. Codex has no hook in this kit yet, so
    your protected branches are its gate.
-4. **Check the checks:**
-   ```bash
-   bash .cursor/skills/run-checks/scripts/selftest.sh   # ends with ALL OK
-   ```
+4. **Commit the kit** through a normal MR.
 5. **Start a ticket** in your agent's chat:
    ```text
    Start ticket PROJ-123. Follow the ticket workflow rule.
    ```
+
+<details>
+<summary><b>Install by hand instead</b></summary>
+
+```bash
+cp -r sdlc-kit/.cursor sdlc-kit/.agent path/to/your-repo/        # every agent: rules, skills, scripts, state
+cp -r sdlc-kit/.claude path/to/your-repo/                        # only if you use Claude Code
+cp -r sdlc-kit/.agents sdlc-kit/AGENTS.md path/to/your-repo/     # only if you use Codex
+chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh
+```
+
+The `.claude/` and `.agents/` folders link to `.cursor/`, so there is one copy of every rule and skill. Copy only the
+folders for the agents your team uses: Cursor also reads `.claude/skills` and `.agents/skills`. Already have an
+`AGENTS.md`? Append ours to it. Then put your Jira project key (or Linear team key) in `.agent/jira-project.txt`;
+on Linear, write `linear` in `.agent/tracker.txt`. If your `origin` remote doesn't say GitLab or GitHub, write
+`gitlab` or `github` in `.agent/git-host.txt`.
+
+</details>
 
 ## Daily use
 
 | When | Type in the agent chat |
 |---|---|
 | Start a ticket | `Start ticket PROJ-123. Follow the ticket workflow rule.` (add `(quick)` or `(full)` to pick the track yourself) |
+| No ticket? Ask in chat | `/chat fix: the export button crashes on an empty list` (or a feature). It drafts a local ticket; you type `start` |
 | The plan is shown | `approve`, or `changes: <what to change>` |
 | Every next chat | `Continue PROJ-123` |
 | The MR got reviewed, or the pipeline finished | New chat: `Continue PROJ-123` |
@@ -161,13 +176,14 @@ Any skill also runs on its own: `/run-checks`, `/self-review`, `/mr-review`, and
 ```text
 .cursor/
 ├── rules/        6 rule files: the workflow (always on) + standards that load only for matching files
-├── skills/       15 skills, one short checklist each, with their templates and check scripts
+├── skills/       16 skills, one short checklist each, with their templates and check scripts
 ├── hooks.json    runs the command guard before risky shell commands
 └── hooks/        block_commands.py: 12 rules, with its own self-test
 .claude/          Claude Code: settings.json runs the same hook; rules/ and skills/ link to .cursor/
 .agents/skills/   Codex: links to .cursor/skills/
 AGENTS.md         Codex: points at the rules, the skills and the checks
 .agent/           size allowlist, guard exceptions, tracker and project key; work/ holds per-ticket state (gitignored)
+install.sh        one-command setup; ends with the doctor checklist (this repo only)
 docs/             the audit and the skills review behind the design (this repo only)
 ```
 
@@ -185,6 +201,7 @@ docs/             the audit and the skills review behind the design (this repo o
 | `/gitlab-mr` | Phase 7 | Explicit `git add`, typed commits, the MR from a template with a Proof section from `proof_pack.sh`, a comment on the ticket |
 | `/mr-feedback` | Phase 8 | Fixes failed jobs, handles unresolved threads, merges `main` on conflicts (never rebases) |
 | `/quick-fix` | Bug, Sub-task | The whole quick track in one chat |
+| `/chat` | No ticket | Turns a request typed in chat into a local ticket (`CHAT-<n>`) with testable acceptance criteria, then runs the normal track |
 | `/jira-create` | Anytime | Writes a detailed Jira or Linear ticket from one sentence, using your team's templates per issue type |
 | `/mr-review` | Code review | Reviews any MR against its ticket; posts severity-labelled threads after you type `post` |
 | `/ticket-qa` | QA | A pass/fail plan from the acceptance criteria, local runs with evidence, the result posted to the ticket |
@@ -214,7 +231,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 
 The checks are what make the kit trustworthy, so they're tested too.
 
-- **77 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
+- **83 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
   secrets, migrations edited on `main`, leftover stubs, swallowed errors, remote databases, force pushes and more.
   Every new case was first proven to fail against the old version of the script.
 - **[The audit](docs/audit.md)** that shaped it: the first version printed `ALL PASS` on bad changes in 7 different
@@ -344,10 +361,19 @@ the kit keeps chats few where the work is small, and new rules go into files tha
 <summary><b>Does it work with Claude Code, Codex or Copilot?</b></summary>
 
 Cursor, Claude Code and Codex are supported. Claude Code gets everything Cursor gets: the same rules (the standards
-still load only for matching files), the 15 skills as slash commands, and the same command hook through
+still load only for matching files), the 16 skills as slash commands, and the same command hook through
 `.claude/settings.json`. Codex reads `AGENTS.md` and finds the skills in `.agents/skills/`. It has no command hook in
 this kit yet, so your protected branches are its gate. Other agents can follow `AGENTS.md`: the rules and skills
 are plain Markdown and the checks are plain shell.
+
+</details>
+
+<details>
+<summary><b>Do I need Jira or Linear?</b></summary>
+
+No. Type the request with `/chat` (`/chat add CSV export to the orders page`). It drafts a local ticket with testable
+acceptance criteria and a `CHAT-<n>` key, you type `start`, and the same tracks, tests and checks run. The MR quotes
+the request and lists the acceptance criteria, so reviewers still see what was asked.
 
 </details>
 
