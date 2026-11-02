@@ -47,6 +47,7 @@ if echo "$CHANGED" | grep -q '^backend/'; then run "backend" bash "$DIR/check_ba
 if echo "$CHANGED" | grep -qE '^backend/(alembic/versions|app/models)/'; then run "migration" bash "$DIR/check_migration.sh"; fi
 if echo "$CHANGED" | grep -q '^frontend/'; then run "frontend" bash "$DIR/check_frontend.sh"; fi
 if echo "$CHANGED" | grep -qE '^(backend|frontend)/'; then run "api-types" bash "$DIR/check_api_types.sh"; fi
+if echo "$CHANGED" | grep -qE '^(backend|frontend)/'; then run "coverage" bash "$DIR/check_coverage.sh"; fi
 
 echo
 VERDICT="ALL PASS"; [ -n "$FAILED" ] && VERDICT="FAIL:$FAILED"

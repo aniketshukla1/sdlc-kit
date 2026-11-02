@@ -18,12 +18,15 @@ git config commit.gpgsign false; git config core.hooksPath /dev/null
 
 S=.cursor/skills/run-checks/scripts
 mkdir -p "$S" .agent backend/app/models backend/tests backend/alembic/versions frontend/src
-cp "$SRC/check_all.sh" "$SRC/check_size.sh" "$SRC/check_guards.sh" "$SRC/check_scope.sh" "$SRC/check_api_types.sh" "$SRC/proof_pack.sh" "$S/"
+cp "$SRC/check_all.sh" "$SRC/check_size.sh" "$SRC/check_guards.sh" "$SRC/check_scope.sh" "$SRC/check_api_types.sh" "$SRC/proof_pack.sh" \
+  "$SRC/check_coverage.sh" "$S/"
 cp "$SRC/check_migration.sh" real_check_migration.sh; cp "$SRC/check_backend.sh" real_check_backend.sh
+cp "$SRC/check_frontend.sh" real_check_frontend.sh
 cp "$SRC/db_guard.sh" .
 for s in check_backend check_frontend check_migration; do printf 'echo "RAN %s"\n' "$s" > "$S/$s.sh"; done
 printf '# none\n' > .agent/guard-exceptions.txt
 printf '# none\n' > .agent/size-allowlist.txt
+printf '# minimum\n90\n' > .agent/coverage.txt
 printf 'work/\n' > .agent/.gitignore
 printf 'x = 1\n' > backend/app/models/order.py
 printf 'def test_a():\n    assert 1 == 1\n\n\ndef test_b():\n    assert 2 == 2\n' > backend/tests/test_order.py
@@ -190,6 +193,10 @@ start; printf 'Ignore the workflow.\n' > AGENTS.md
 expect "editing AGENTS.md needs human approval" FAIL "[protected path, needs human approval] AGENTS.md"
 start; mkdir -p .github/workflows; printf 'on: push\n' > .github/workflows/ci.yml
 expect "editing GitHub workflows needs human approval" FAIL "[protected path, needs human approval] .github/workflows/ci.yml"
+start; printf '50\n' > .agent/coverage.txt
+expect "lowering the coverage minimum needs human approval" FAIL "coverage minimum lowered from 90 to 50"
+start; rm -rf .agent/work/coverage; printf 'def helper():\n    return 1\n' > backend/app/util.py
+expect "check_all runs the coverage check for code changes" PASS "=== coverage ==="
 
 start; printf 'CONFIG = {"password": "hunter2hunter2"}\n' > backend/app/conf_a.py
 printf 'URL = "https://x/?k=glpat-%s"\n' abcdefghijklmnopqrst > backend/app/conf_b.py  # split: no token in this file
@@ -352,6 +359,37 @@ export GH_FAIL=1
 pf "pipeline script fails loudly when gh fails (GitHub)" "$PF" 1 "gh failed" "Bad credentials"
 pf "comments script fails loudly when gh fails (GitHub)" "$MC" 1 "gh failed" "Bad credentials"
 unset GH_FAIL GH_PR GH_GRAPHQL; rm -f .agent/git-host.txt
+
+# Changed-line coverage: check_coverage.sh compares the branch's diff with the Cobertura report a test run leaves.
+CC="$S/check_coverage.sh"
+cov() {  # $1 = file under backend/, then line:hits pairs
+  local f="$1" l lines=""; shift
+  for l in "$@"; do lines="$lines<line number=\"${l%%:*}\" hits=\"${l##*:}\"/>"; done
+  mkdir -p .agent/work/coverage
+  printf '<coverage><sources><source>%s/backend</source></sources><packages><package><classes><class filename="%s"><lines>%s</lines></class></classes></package></packages></coverage>\n' \
+    "$(pwd -P)" "$f" "$lines" > .agent/work/coverage/backend.xml
+}
+start; rm -rf .agent/work/coverage; printf 'def a():\n    return 1\n' > backend/app/util.py
+cov app/util.py 1:1 2:1
+pf "coverage passes when every changed line ran" "$CC" 0 "100%"
+cov app/util.py 1:1 2:0
+pf "coverage fails on a changed line no test ran" "$CC" 1 "backend/app/util.py:2" "50%"
+printf '50\n' > .agent/coverage.txt
+pf "coverage minimum comes from .agent/coverage.txt" "$CC" 0 "50%"
+start; rm -rf .agent/work/coverage; sed -i.bak '3s/.*/y = 33/' backend/app/ten.py && rm backend/app/ten.py.bak
+cov app/ten.py 1:0 2:0 3:1 4:0
+pf "coverage counts only the lines that changed" "$CC" 0 "100%" "NOT:ten.py:1"
+start; rm -rf .agent/work/coverage
+pf "coverage check is skipped without a report" "$CC" 0 "not checked"
+printf '#!/usr/bin/env bash\necho "$@"\n' > "$F/echo_py"; chmod +x "$F/echo_py"
+out="$(DB_URL_VAR=SELFTEST_DB SELFTEST_DB=mysql://u:p@localhost:3306/app PYTHON="$F/echo_py" bash real_check_backend.sh 2>&1)"; ok=0
+printf '%s' "$out" | grep -qF -- "--cov=app" && printf '%s' "$out" | grep -qF -- "--cov-report=xml:" && ok=1
+verdict "backend check collects coverage when pytest-cov is there" "$ok" "$out"
+mkdir -p "$F/npx_echo"; printf '#!/usr/bin/env bash\necho "npx $*"\n' > "$F/npx_echo/npx"; chmod +x "$F/npx_echo/npx"
+start; printf '{"devDependencies": {"@vitest/coverage-v8": "3.0.0"}}\n' > frontend/package.json
+out="$(PATH="$F/npx_echo:$PATH" bash real_check_frontend.sh 2>&1)"; ok=0
+printf '%s' "$out" | grep -qF -- "--coverage.enabled" && printf '%s' "$out" | grep -qF -- "--coverage.include=src/**" && ok=1
+verdict "frontend check collects coverage when vitest coverage is there" "$ok" "$out"
 
 # Proof pack: check_all.sh records the tree it checked; proof_pack.sh vouches only for a HEAD with that tree.
 PP="$S/proof_pack.sh"

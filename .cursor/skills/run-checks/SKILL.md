@@ -24,8 +24,9 @@ description: Runs every automated check (file size, forbidden patterns, plan sco
 - `check_size.sh`: files ≤ 200 lines, React components ≤ 150
 - `check_guards.sh`: debug code, ignore comments, skipped or removed tests, secrets, leftover stubs, swallowed errors, protected paths, edits to migrations already on main
 - `check_scope.sh`: every changed file must be named in PLAN.md
-- `check_backend.sh`: ruff, ruff format, mypy on changed files + full pytest (local DB only)
-- `check_frontend.sh`: tsc, eslint on changed files + full vitest
+- `check_backend.sh`: ruff, ruff format, mypy on changed files + full pytest (local DB only), with coverage when pytest-cov is installed
+- `check_frontend.sh`: tsc, eslint on changed files + full vitest, with coverage when `@vitest/coverage-v8` or `-istanbul` is installed
+- `check_coverage.sh`: at least the minimum in `.agent/coverage.txt` (default 90%) of the changed production lines ran in those tests; skipped without a coverage report
 - `check_migration.sh`: alembic round trip of the changed migrations, single head, model drift (local DB only; also runs when models change)
 - `db_guard.sh`: refuses a DB whose host isn't in `LOCAL_DB_HOSTS` (used by the two above)
 - `check_api_types.sh`: the generated API types match the backend's OpenAPI schema (`--write` regenerates them); skipped until set up

@@ -53,6 +53,15 @@ while IFS= read -r f; do
   [ -z "$f" ] && continue
   if [ -f "$EXC" ] && grep -qxF "$f" "$EXC"; then echo "[human exception] $f"; continue; fi
   case "$f" in .env.example|*/.env.example) continue ;; esac
+  case "$f" in .agent/coverage.txt)  # raising the bar is fine; lowering it is a human's call
+    old="$(git show "$MB:$f" 2>/dev/null | sed -n '/^[^#]/{p;q;}')"; new="$(sed -n '/^[^#]/{p;q;}' "$f" 2>/dev/null)"
+    if [ -n "$old" ] && [ "${new:-0}" -lt "$old" ] 2>/dev/null; then
+      echo "[weakened bar, needs human approval] $f: coverage minimum lowered from $old to ${new:-nothing}"; fail=1
+    else
+      echo "[note] $f changed. Only humans edit it; reviewers check it in the MR diff."
+    fi
+    continue ;;
+  esac
   case "$f" in .agent/guard-exceptions.txt|.agent/size-allowlist.txt)
     echo "[note] $f changed. Only humans edit it; reviewers check it in the MR diff."; continue ;;
   esac

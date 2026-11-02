@@ -21,10 +21,17 @@ fi
 if [ -n "$TYPED" ]; then
   echo "> mypy"; $PY -m mypy --follow-imports=silent $TYPED || fail=1
 fi
+COV=()
+rm -f "$ROOT/.agent/work/coverage/backend.xml"
+if $PY -c "import pytest_cov" >/dev/null 2>&1; then  # check_coverage.sh reads this report; no pytest-cov, no check
+  mkdir -p "$ROOT/.agent/work/coverage"
+  export COVERAGE_FILE="$ROOT/.agent/work/coverage/.coverage"
+  COV=(--cov=app "--cov-report=xml:$ROOT/.agent/work/coverage/backend.xml")
+fi
 source "$HERE/db_guard.sh"
 if db_guard optional; then
   echo "> pytest (last 40 lines)"
-  $PY -m pytest -q -rf --tb=short -p no:cacheprovider 2>&1 | tail -n 40
+  $PY -m pytest -q -rf --tb=short -p no:cacheprovider ${COV[@]+"${COV[@]}"} 2>&1 | tail -n 40
   [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
 else
   fail=1

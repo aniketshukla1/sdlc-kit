@@ -22,7 +22,13 @@ if [ -n "$FILES" ]; then
   [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
 fi
 
+COV=()
+rm -rf "$ROOT/.agent/work/coverage/frontend"
+if grep -qE '"@vitest/coverage-(v8|istanbul)"' package.json 2>/dev/null; then  # for check_coverage.sh
+  COV=(--coverage.enabled --coverage.reporter=cobertura "--coverage.include=src/**"
+       "--coverage.reportsDirectory=$ROOT/.agent/work/coverage/frontend")
+fi
 echo "> vitest (last 40 lines)"
-npx --no-install vitest run --reporter=dot 2>&1 | tail -n 40
+npx --no-install vitest run --reporter=dot ${COV[@]+"${COV[@]}"} 2>&1 | tail -n 40
 [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
 exit $fail

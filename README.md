@@ -11,7 +11,7 @@ It plans before it codes, writes failing tests first, and can't say "done" until
 ![Agents](https://img.shields.io/badge/agents-Cursor%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex-111827)
 ![Ticket in](https://img.shields.io/badge/ticket%20in-Jira%20%C2%B7%20Linear-0052CC)
 ![MR out](https://img.shields.io/badge/MR%20out-GitLab%20%C2%B7%20GitHub-FC6D26)
-![Self-tests](https://img.shields.io/badge/self--tests-83%2F83%20passing-22c55e)
+![Self-tests](https://img.shields.io/badge/self--tests-92%2F92%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
 **[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
@@ -220,6 +220,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 | Lint, types and the full test suite pass | `check_backend.sh`, `check_frontend.sh` |
 | Migrations reverse cleanly, one Alembic head, no drift from the models | `check_migration.sh` |
 | Frontend API types match the backend's OpenAPI schema (once set up) | `check_api_types.sh` |
+| At least 90% of the changed production lines run in the tests (the minimum is in `.agent/coverage.txt`; lowering it needs a human) | `check_coverage.sh`, once `pytest-cov` or `@vitest/coverage-v8` is installed |
 | Tests and migrations only ever run against a local database | `db_guard.sh` (`LOCAL_DB_HOSTS`) |
 | Tests written before the code: red first, then green | `/write-tests` and the implement skills (red lines logged in `PROGRESS.md`, checked in `/self-review`) |
 | The MR carries its proof: `ALL PASS` on exactly the commit under review, the logged red lines, the changed files | `proof_pack.sh` (refuses if anything changed after the last check) |
@@ -231,7 +232,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 
 The checks are what make the kit trustworthy, so they're tested too.
 
-- **83 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
+- **92 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
   secrets, migrations edited on `main`, leftover stubs, swallowed errors, remote databases, force pushes and more.
   Every new case was first proven to fail against the old version of the script.
 - **[The audit](docs/audit.md)** that shaped it: the first version printed `ALL PASS` on bad changes in 7 different
@@ -406,7 +407,8 @@ Ideas on the table, not promises. Open an issue to vote or to pick one up.
 - [ ] A command guard for Codex (its experimental `.codex/rules`)
 - [ ] More stacks: Django, Next.js, Spring
 - [x] Linear as a ticket source
-- [ ] Changed-line coverage and mutation testing in CI
+- [x] Changed-line coverage
+- [ ] Mutation testing on changed lines (does each new test fail when the code it covers breaks?)
 - [ ] Ready-made recipes for the Chrome DevTools checks
 
 ## Contributing

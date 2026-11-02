@@ -353,7 +353,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
       <ul class="facts" aria-label="At a glance">
         <li><b>16</b> skills</li>
         <li><b>12</b> hook rules</li>
-        <li><b>83</b> self-tests</li>
+        <li><b>92</b> self-tests</li>
       </ul>
     </div>
 
@@ -406,7 +406,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <p class="say"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><span class="sr">The agent says: </span><q>Looks done to me.</q></span></p>
         <div class="kit">
           <h3><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><code>check_all.sh</code> decides</span></h3>
-          <p>Lint, types, tests, migrations and 11 kinds of guards, run on the diff. The model doesn't get a vote, and the MR shows the verdict for its exact commit.</p>
+          <p>Lint, types, tests, changed-line coverage, migrations and 11 kinds of guards, run on the diff. The model doesn't get a vote, and the MR shows the verdict for its exact commit.</p>
         </div>
       </li>
       <li class="reveal">
@@ -525,6 +525,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>Files ≤ 200 lines, React components ≤ 150</p><span class="by">check_size.sh</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>No force push, merge, <code>reset --hard</code>, <code>ssh</code> or <code>kubectl</code>; network only to localhost</p><span class="by">command hook · block_commands.py</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>The MR carries its proof: <code>ALL PASS</code> on exactly the commit under review, the logged red lines, the changed files</p><span class="by">proof_pack.sh</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><p>At least 90% of the changed production lines run in the tests; lowering the minimum needs a human</p><span class="by">check_coverage.sh</span></li>
       </ul>
       <p class="note">The same guards catch deleted or skipped tests, weakened lint and test config, secrets, edits to migrations already on main, stubs left over from test-first, and swallowed errors.</p>
     </div>
@@ -587,7 +588,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
       <p class="sub">The checks are what make the kit trustworthy, so they're tested too.</p>
     </header>
     <ul class="nums">
-      <li class="reveal"><b>83</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
+      <li class="reveal"><b>92</b><h3>Self-tests</h3><p>The real scripts run in throwaway git repos against every bypass we know. Each new case was first proven to fail against the old script.</p></li>
       <li class="reveal"><b>7</b><h3>Holes found, all fixed</h3><p>The first version printed ALL PASS on bad changes in 7 ways. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/audit.md">Read the audit</a></p></li>
       <li class="reveal"><b>25</b><h3>Skills reviewed</h3><p>Every one of Addy Osmani's agent-skills compared with the kit. <a href="https://github.com/aniketshukla1/sdlc-kit/blob/main/docs/skills-gap-review.md">Read the review</a></p></li>
       <li class="reveal"><b>12</b><h3>Hook rules</h3><p>Risky commands are denied before they run, not flagged after.</p></li>

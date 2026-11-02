@@ -40,6 +40,12 @@ else
   echo "  ✗ self-tests:"; printf '%s\n' "$OUT" | grep -E '^(WRONG|FAILED)' | sed 's/^/      /'; bad=1
 fi
 [ -n "$KEY" ] || echo "  ! no project key in .agent/jira-project.txt yet: /jira-create will ask for it"
+if [ -d backend ] && ! (cd backend && ${PYTHON:-python} -c "import pytest_cov") >/dev/null 2>&1; then
+  echo "  ! install pytest-cov in the backend so the checks measure changed-line coverage"
+fi
+if [ -f frontend/package.json ] && ! grep -qE '"@vitest/coverage-(v8|istanbul)"' frontend/package.json; then
+  echo "  ! add @vitest/coverage-v8 to the frontend so the checks measure changed-line coverage"
+fi
 
 echo
 echo "Next:"
