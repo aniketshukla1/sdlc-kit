@@ -1,6 +1,6 @@
 ---
 name: mr-review
-description: Reviews a GitLab merge request against its Jira ticket. Checks that every acceptance criterion has code and a test that would catch a regression, runs the kit's checks, reviews each file for correctness, readability, architecture, security and performance, and drafts severity-labelled findings. Posts them to GitLab only after the human types post. Use when asked to review an MR or the code of a Jira ticket.
+description: Reviews a merge request (a pull request on GitHub) against its Jira ticket. Checks that every acceptance criterion has code and a test that would catch a regression, runs the kit's checks, reviews each file for correctness, readability, architecture, security and performance, and drafts severity-labelled findings. Posts them only after the human types post. Use when asked to review an MR or the code of a Jira ticket.
 ---
 # MR review
 

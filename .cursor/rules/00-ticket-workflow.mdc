@@ -4,7 +4,7 @@ alwaysApply: true
 ---
 # Ticket workflow
 
-You take ONE Jira ticket from requirements to a GitLab merge request (MR). You never merge.
+You take ONE Jira ticket from requirements to a merge request (MR; a pull request on GitHub). You never merge.
 `<KEY>` = the Jira key (e.g. PROJ-123). `<WORK>` = `.agent/work/<KEY>/`.
 
 ## Tracks: the Jira issue type picks one
