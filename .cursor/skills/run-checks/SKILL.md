@@ -20,7 +20,7 @@ description: Runs every automated check (file size, forbidden patterns, plan sco
 7. When `ALL PASS`: paste the final summary lines into the PROGRESS.md log.
 
 ## Scripts (for reference; do not edit)
-- `check_all.sh`: runs the checks below for files changed vs `$BASE_REF` (default `origin/main`); fails if that ref is missing
+- `check_all.sh`: runs the checks below for files changed vs `$BASE_REF` (default `origin/main`); fails if that ref is missing. On a ticket branch it records the verdict and the exact content checked in `.agent/work/<KEY>/last-check.txt`
 - `check_size.sh`: files ≤ 200 lines, React components ≤ 150
 - `check_guards.sh`: debug code, ignore comments, skipped or removed tests, secrets, leftover stubs, swallowed errors, protected paths, edits to migrations already on main
 - `check_scope.sh`: every changed file must be named in PLAN.md
@@ -29,4 +29,5 @@ description: Runs every automated check (file size, forbidden patterns, plan sco
 - `check_migration.sh`: alembic round trip of the changed migrations, single head, model drift (local DB only; also runs when models change)
 - `db_guard.sh`: refuses a DB whose host isn't in `LOCAL_DB_HOSTS` (used by the two above)
 - `check_api_types.sh`: the generated API types match the backend's OpenAPI schema (`--write` regenerates them); skipped until set up
+- `proof_pack.sh`: the MR's Proof section (verdict, red lines, changed files); refuses unless the last `ALL PASS` ran on exactly HEAD's content. Used by /gitlab-mr and /mr-feedback
 - `selftest.sh`: tests these scripts, the mr-feedback scripts and the Cursor command hook. For humans changing them; not part of run-checks

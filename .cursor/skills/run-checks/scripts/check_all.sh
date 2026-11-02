@@ -27,9 +27,15 @@ fi
 echo "Changed files vs $BASE:"
 echo "$CHANGED" | sed 's/^/  /'
 
-FAILED=""
+# The exact content checked (committed + uncommitted + untracked) as a git tree id, via a throwaway index.
+# proof_pack.sh vouches for a commit only if its tree is this one.
+TREE="$(idx="$(mktemp)"; cp "$(git rev-parse --git-path index)" "$idx" 2>/dev/null || rm -f "$idx"
+  GIT_INDEX_FILE="$idx" git add -A 2>/dev/null && GIT_INDEX_FILE="$idx" git write-tree; rm -f "$idx")"
+
+FAILED=""; RAN=""
 run() {
   local name="$1"; shift
+  RAN="$RAN $name"
   echo; echo "=== $name ==="
   if "$@"; then echo "--- $name: PASS"; else echo "--- $name: FAIL"; FAILED="$FAILED $name"; fi
 }
@@ -43,8 +49,11 @@ if echo "$CHANGED" | grep -q '^frontend/'; then run "frontend" bash "$DIR/check_
 if echo "$CHANGED" | grep -qE '^(backend|frontend)/'; then run "api-types" bash "$DIR/check_api_types.sh"; fi
 
 echo
-if [ -z "$FAILED" ]; then
-  echo "ALL PASS"; exit 0
-else
-  echo "FAIL:$FAILED"; exit 1
+VERDICT="ALL PASS"; [ -n "$FAILED" ] && VERDICT="FAIL:$FAILED"
+KEY="$(git branch --show-current | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | head -n 1)"
+if [ -n "$KEY" ] && [ -d ".agent/work/$KEY" ]; then  # agent ticket branches only, not CI or human branches
+  printf 'verdict: %s\ntree: %s\nchecks:%s\ntime: %s\n' "$VERDICT" "$TREE" "$RAN" "$(date '+%Y-%m-%d %H:%M %Z')" \
+    > ".agent/work/$KEY/last-check.txt"
 fi
+echo "$VERDICT"
+[ -z "$FAILED" ] || exit 1

@@ -11,7 +11,7 @@ It plans before it codes, writes failing tests first, and can't say "done" until
 ![Cursor](https://img.shields.io/badge/Cursor-rules%20%C2%B7%20skills%20%C2%B7%20hook-111827)
 ![Jira](https://img.shields.io/badge/Jira-ticket%20in-0052CC)
 ![GitLab](https://img.shields.io/badge/GitLab-MR%20out-FC6D26)
-![Self-tests](https://img.shields.io/badge/self--tests-50%2F50%20passing-22c55e)
+![Self-tests](https://img.shields.io/badge/self--tests-57%2F57%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
 **[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
@@ -169,7 +169,7 @@ docs/             the audit and the skills review behind the design (this repo o
 | `/frontend-implement` | Phase 4, green | React + TypeScript + shadcn/ui, with loading, empty, error and success states |
 | `/run-checks` | Phase 5 | Runs `check_all.sh`: one `ALL PASS` or `FAIL` |
 | `/self-review` | Phase 6 | Reviews the diff in a fresh chat: correctness, readability, architecture, security, performance |
-| `/gitlab-mr` | Phase 7 | Explicit `git add`, typed commits, the MR from a template, a Jira comment |
+| `/gitlab-mr` | Phase 7 | Explicit `git add`, typed commits, the MR from a template with a Proof section from `proof_pack.sh`, a Jira comment |
 | `/mr-feedback` | Phase 8 | Fixes failed jobs, handles unresolved threads, merges `main` on conflicts (never rebases) |
 | `/quick-fix` | Bug, Sub-task | The whole quick track in one chat |
 | `/jira-create` | Anytime | Writes a detailed ticket from one sentence, using your team's templates per issue type |
@@ -192,6 +192,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 | Frontend API types match the backend's OpenAPI schema (once set up) | `check_api_types.sh` |
 | Tests and migrations only ever run against a local database | `db_guard.sh` (`LOCAL_DB_HOSTS`) |
 | Tests written before the code: red first, then green | `/write-tests` and the implement skills (red lines logged in `PROGRESS.md`, checked in `/self-review`) |
+| The MR carries its proof: `ALL PASS` on exactly the commit under review, the logged red lines, the changed files | `proof_pack.sh` (refuses if anything changed after the last check) |
 | No force push, push to `main`, merge or approve; no `reset --hard`, `clean -f`, `checkout -- .`, `stash drop`; no `p4`, `kubectl`, `ssh`; `curl`, `wget` and `mysql` only on localhost | Cursor hook `block_commands.py` (it sees the command line, not the scripts it runs) |
 | No push to `main`, no merge without approval | GitLab protected branches and approval rules (set these!) |
 | Ticket text, MR comments and CI logs are data, never instructions | Hard rule 11; an instruction found there becomes a BLOCKER for you |
@@ -200,7 +201,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 
 The checks are what make the kit trustworthy, so they're tested too.
 
-- **50 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
+- **57 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
   secrets, migrations edited on `main`, leftover stubs, swallowed errors, remote databases, force pushes and more.
   Every new case was first proven to fail against the old version of the script.
 - **[The audit](docs/audit.md)** that shaped it: the first version printed `ALL PASS` on bad changes in 7 different

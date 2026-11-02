@@ -34,9 +34,6 @@ None
 ## Rollback
 <revert this MR; the migration downgrade (tested); or the feature flag to turn off>
 
-## Checks
-```
-<paste the final lines of check_all.sh, ending with ALL PASS>
-```
+<proof.md from step 7, pasted unedited: proof_pack.sh's output, starting with "## Proof">
 
 _Created by the coding agent. Screenshots for UI changes: reviewer to add if needed._

@@ -53,7 +53,7 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
 # <KEY>: <summary>
 Track: quick   Type: <bug/sub-task>   Link: <jira url>
 - Problem: <bug: steps → expected vs actual; sub-task: what "done" means>
-- Regression test: <file::test name> fails with: <one line of the failure>   (sub-task: the test written red in Part 2)
+- Regression test: <file::test name>: red: <one line of the failure>   (sub-task: the test written red in Part 2)
 - Root cause: <file:line: why>. Callers checked: <where the changed function is called>
 - Fix: <what changes, 1–3 lines>
 - Human actions required: None

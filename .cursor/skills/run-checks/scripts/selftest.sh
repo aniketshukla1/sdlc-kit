@@ -18,7 +18,7 @@ git config commit.gpgsign false; git config core.hooksPath /dev/null
 
 S=.cursor/skills/run-checks/scripts
 mkdir -p "$S" .agent backend/app/models backend/tests backend/alembic/versions frontend/src
-cp "$SRC/check_all.sh" "$SRC/check_size.sh" "$SRC/check_guards.sh" "$SRC/check_scope.sh" "$SRC/check_api_types.sh" "$S/"
+cp "$SRC/check_all.sh" "$SRC/check_size.sh" "$SRC/check_guards.sh" "$SRC/check_scope.sh" "$SRC/check_api_types.sh" "$SRC/proof_pack.sh" "$S/"
 cp "$SRC/check_migration.sh" real_check_migration.sh; cp "$SRC/check_backend.sh" real_check_backend.sh
 cp "$SRC/db_guard.sh" .
 for s in check_backend check_frontend check_migration; do printf 'echo "RAN %s"\n' "$s" > "$S/$s.sh"; done
@@ -232,6 +232,28 @@ export GLAB_FAIL=1
 pf "pipeline script fails loudly when glab fails" "$PF" 1 "glab api failed" "401 Unauthorized"
 pf "comments script fails loudly when glab fails" "$MC" 1 "glab api failed" "401 Unauthorized"
 unset GLAB_FAIL GLAB_STATUS GLAB_JOBS GLAB_DISCUSSIONS
+
+# Proof pack: check_all.sh records the tree it checked; proof_pack.sh vouches only for a HEAD with that tree.
+PP="$S/proof_pack.sh"
+ticket() { start; rm -rf .agent/work/PROJ-1; plan '| `backend/app/util.py` | New |'; printf 'def helper():\n    return 1\n' > backend/app/util.py; }
+ticket; bash "$S/check_all.sh" >/dev/null 2>&1; git add backend/app/util.py; git commit -qm util
+rec="$(cat .agent/work/PROJ-1/last-check.txt 2>/dev/null)"; ok=0
+[ "$(printf '%s\n' "$rec" | sed -n 's/^tree: //p')" = "$(git rev-parse 'HEAD^{tree}')" ] && printf '%s\n' "$rec" | grep -qx 'verdict: ALL PASS' && ok=1
+verdict "check_all records the tree it checked" "$ok" "$rec"
+printf -- '- backend/tests/test_util.py::test_helper: red: NameError: helper\n' > .agent/work/PROJ-1/PROGRESS.md
+pf "proof pack vouches for the commit that was checked" "$PP" 0 "ALL PASS" "$(git rev-parse --short HEAD)" \
+  "backend/app/util.py" "test_helper: red: NameError: helper"
+printf 'y = 2\n' >> backend/app/models/order.py; git commit -qam later
+pf "proof pack refuses a commit made after the check" "$PP" 1 "different content" "NOT:## Proof"
+ticket; bash "$S/check_all.sh" >/dev/null 2>&1
+pf "proof pack refuses checked changes that aren't committed" "$PP" 1 "different content"
+ticket; printf 'print("debug")\n' >> backend/app/util.py; bash "$S/check_all.sh" >/dev/null 2>&1; git add backend/app/util.py; git commit -qm util
+pf "proof pack refuses a failed check" "$PP" 1 "did not pass" "NOT:## Proof"
+ticket; printf -- '- Regression test: backend/tests/test_util.py::test_q: red: assert 1 == 2\n' >> .agent/work/PROJ-1/PLAN.md
+bash "$S/check_all.sh" >/dev/null 2>&1; git add backend/app/util.py; git commit -qm util
+pf "proof pack shows a quick-track red line from PLAN.md" "$PP" 0 "test_q: red: assert 1 == 2"
+ticket
+pf "proof pack needs a check record" "$PP" 1 "No check record"
 
 echo
 if [ "$failures" -eq 0 ]; then echo "ALL OK"; exit 0; fi

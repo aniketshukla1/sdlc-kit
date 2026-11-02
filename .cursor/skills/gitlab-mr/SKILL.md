@@ -16,8 +16,12 @@ description: Phase 7. Commits, rebases, pushes the branch and opens a GitLab mer
    Conflict in a file you did not change, or you're unsure → `git rebase --abort` and ask the human.
    After a rebase, run /run-checks again (2 Alembic heads → /db-migration step 7).
 6. Push: `git push -u origin HEAD`. Never `--force`. If a push is rejected, ask the human.
-7. Fill `mr-template.md` (next to this file) into `.agent/work/<KEY>/MR.md`. Every section, or `None`.
-8. Create the MR:
+7. Proof: `bash .cursor/skills/run-checks/scripts/proof_pack.sh > .agent/work/<KEY>/proof.md`.
+   It refuses if anything changed after the last `ALL PASS` (an edit, a commit, a rebase): run /run-checks,
+   commit any fix, push, and run it again. Never write or edit the proof by hand.
+8. Fill `mr-template.md` (next to this file) into `.agent/work/<KEY>/MR.md`. Every section, or `None`.
+   The Proof section is `proof.md`, pasted unedited.
+9. Create the MR:
    ```
    glab mr create --source-branch "$(git branch --show-current)" --target-branch main \
      --title "<KEY>: <summary>" --description "$(cat .agent/work/<KEY>/MR.md)" \
@@ -25,12 +29,13 @@ description: Phase 7. Commits, rebases, pushes the branch and opens a GitLab mer
    ```
    Add `--draft` if "Human actions required" is not `None`.
    Verify: the command prints an MR URL ending in `/merge_requests/<IID>`. The IID is that number.
-9. Save MR URL and IID in PROGRESS.md. Set `Phase: 7-mr (open)`.
+10. Save MR URL and IID in PROGRESS.md. Set `Phase: 7-mr (open)`.
    PROGRESS.md has `Parent: <KEY>`? Also set this sub-task's row in that parent's Roadmap (its PLAN.md) to `MR !<IID>`.
-10. Post a Jira comment (MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.
-11. Tell the human: `MR created: <url>. After review or a pipeline result, start a new chat and type: Continue <KEY>`.
+11. Post a Jira comment (MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.
+12. Tell the human: `MR created: <url>. After review or a pipeline result, start a new chat and type: Continue <KEY>`.
 
 ## Done when
 - [ ] Only planned files committed, commit messages follow the format
 - [ ] Branch pushed without force, MR created against `main`
+- [ ] The MR's Proof section is `proof_pack.sh` output for the pushed head, unedited
 - [ ] MR URL in PROGRESS.md and Jira
