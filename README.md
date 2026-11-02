@@ -14,7 +14,7 @@ It plans before it codes, writes failing tests first, and can't say "done" until
 ![Self-tests](https://img.shields.io/badge/self--tests-50%2F50%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
-[Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
+**[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
 
 <img src="docs/demo.gif" width="880" alt="21-second tour: an AI agent claims a ticket is done; sdlc-kit's tests start red and turn green, its check script catches a debug print on line 42, and its hook blocks a force push. It never merges. You do.">
 
