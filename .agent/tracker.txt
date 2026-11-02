@@ -1,0 +1,2 @@
+# The ticket tracker, on the next line: jira or linear. Humans edit this file, not the agent.
+jira

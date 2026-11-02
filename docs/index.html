@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sdlc-kit: make your AI coding agent prove it's done</title>
-<meta name="description" content="sdlc-kit is an open-source kit for Cursor, Claude Code and Codex that takes a Jira ticket to a reviewed merge request on GitLab or GitHub. The agent plans first, writes failing tests first, and can't call it done until real check scripts agree.">
+<meta name="description" content="sdlc-kit is an open-source kit for Cursor, Claude Code and Codex that takes a Jira or Linear ticket to a reviewed merge request on GitLab or GitHub. The agent plans first, writes failing tests first, and can't call it done until real check scripts agree.">
 <meta name="theme-color" content="#0A0B0D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="sdlc-kit">
 <meta property="og:title" content="sdlc-kit: make your AI coding agent prove it's done">
-<meta property="og:description" content="Jira ticket in. Reviewed MR out. Scripts decide when it's done.">
+<meta property="og:description" content="Ticket in. Reviewed MR out. Scripts decide when it's done.">
 <meta property="og:url" content="https://aniketshukla1.github.io/sdlc-kit/">
 <meta property="og:image" content="https://aniketshukla1.github.io/sdlc-kit/poster.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -339,9 +339,9 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
 <section class="hero grid-bg" aria-labelledby="hero-h">
   <div class="wrap">
     <div>
-      <p class="eyebrow"><i class="dot" aria-hidden="true"></i>Open source · MIT <span class="sep" aria-hidden="true">/</span> Cursor · Claude Code · Codex <span class="sep" aria-hidden="true">/</span> Jira + GitLab or GitHub</p>
+      <p class="eyebrow"><i class="dot" aria-hidden="true"></i>Open source · MIT <span class="sep" aria-hidden="true">/</span> Cursor · Claude Code · Codex <span class="sep" aria-hidden="true">/</span> Jira or Linear · GitLab or GitHub</p>
       <h1 id="hero-h">Your AI agent says it's done. <span class="ok">Make it prove it.</span></h1>
-      <p class="lede">sdlc-kit takes a Jira ticket to a reviewed merge request on GitLab or GitHub. The agent plans before it codes, writes failing tests first, and can't say "done" until real check scripts agree.</p>
+      <p class="lede">sdlc-kit takes a Jira or Linear ticket to a reviewed merge request on GitLab or GitHub. The agent plans before it codes, writes failing tests first, and can't say "done" until real check scripts agree.</p>
       <div class="install">
         <code>git clone https://github.com/aniketshukla1/sdlc-kit.git</code>
         <button class="copy" type="button" data-copy aria-label="Copy the clone command"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button>
@@ -432,7 +432,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
     <header class="head reveal">
       <p class="idx"><b>02</b>How it works</p>
       <h2 id="how-h">Sized to the ticket</h2>
-      <p class="sub">The Jira issue type picks the track, so small tickets stay small. Every chat starts from <code>PROGRESS.md</code>, so <code>Continue PROJ-123</code> picks up exactly where the last one stopped.</p>
+      <p class="sub">The ticket's type picks the track, so small tickets stay small (on Linear, a <code>Bug</code> label or a sub-issue). Every chat starts from <code>PROGRESS.md</code>, so <code>Continue PROJ-123</code> picks up exactly where the last one stopped.</p>
     </header>
     <div class="reveal">
       <div class="tablist" role="tablist" aria-label="Workflow tracks">
@@ -463,7 +463,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
           <li><span class="node">4</span><h3>Build</h3><p>Tests <span class="r">red</span>, then code <span class="g">green</span>, per task</p></li>
           <li><span class="node">5</span><h3>Check</h3><p>Only <code>ALL PASS</code> counts</p></li>
           <li><span class="node">6</span><h3>Self-review</h3><p>Fresh chat, five axes</p></li>
-          <li><span class="node">7</span><h3>MR</h3><p>Opened, linked in Jira</p></li>
+          <li><span class="node">7</span><h3>MR</h3><p>Opened, linked on the ticket</p></li>
           <li><span class="node">8</span><h3>Feedback</h3><p>Pipeline green, threads handled</p></li>
           <li class="gate"><span class="node"><svg class="ic" aria-hidden="true"><use href="#i-merge"/></svg></span><h3>You merge</h3><p>Protected branches<span class="sr"> (human gate)</span></p></li>
         </ol>
@@ -569,7 +569,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
         <h3 id="sg-more">Shortcuts and teammates <span>any time</span></h3>
         <dl>
           <div><dt>quick-fix</dt><dd>The whole quick track in one chat.</dd></div>
-          <div><dt>jira-create</dt><dd>A detailed ticket from one sentence, using your team's templates.</dd></div>
+          <div><dt>jira-create</dt><dd>A detailed Jira or Linear ticket from one sentence, using your team's templates.</dd></div>
           <div><dt>mr-review</dt><dd>Reviews any MR against its ticket; posts labelled threads only after you type <code>post</code>.</dd></div>
           <div><dt>ticket-qa</dt><dd>A pass/fail QA plan from the acceptance criteria, with evidence.</dd></div>
         </dl>
@@ -599,7 +599,7 @@ h2{font-size:clamp(1.8rem,1.2rem + 1.9vw,2.6rem);line-height:1.12;letter-spacing
     <header class="head stick reveal">
       <p class="idx"><b>07</b>Quick start</p>
       <h2 id="q-h">Five minutes to your first ticket</h2>
-      <p class="sub">You need Cursor, Claude Code or Codex, GitLab with <code>glab</code> or GitHub with <code>gh</code>, a Jira MCP server, <code>git</code>, <code>python3</code> and <code>ripgrep</code>. The standards target FastAPI + React; other stacks mostly mean editing paths.</p>
+      <p class="sub">You need Cursor, Claude Code or Codex, GitLab with <code>glab</code> or GitHub with <code>gh</code>, a Jira or Linear MCP server, <code>git</code>, <code>python3</code> and <code>ripgrep</code>. The standards target FastAPI + React; other stacks mostly mean editing paths.</p>
     </header>
     <ol class="qs">
       <li class="reveal">
@@ -613,7 +613,7 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
       </li>
       <li class="reveal">
         <h3>Connect your tools</h3>
-        <p>Run <code>glab auth login</code> or <code>gh auth login</code>, add your Jira MCP server to your agent, and put your Jira project key in <code>.agent/jira-project.txt</code>. The kit reads GitLab or GitHub from your <code>origin</code> remote.</p>
+        <p>Run <code>glab auth login</code> or <code>gh auth login</code>, add your Jira or Linear MCP server to your agent, and put your project key in <code>.agent/jira-project.txt</code> (Linear: your team key, and <code>linear</code> in <code>.agent/tracker.txt</code>). The kit reads GitLab or GitHub from your <code>origin</code> remote.</p>
       </li>
       <li class="reveal">
         <h3>Trust the workspace</h3>
@@ -647,7 +647,7 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
       <details><summary>Does it work with Claude Code, Codex or Copilot?</summary>
         <p>Cursor, Claude Code and Codex are supported. Claude Code gets the same rules, the 15 skills as slash commands and the same command hook. Codex reads <code>AGENTS.md</code> and the skills; it has no command hook yet, so your protected branches are its gate. Other agents can follow <code>AGENTS.md</code>: everything is plain Markdown and shell.</p></details>
       <details><summary>GitHub instead of GitLab? Linear instead of Jira?</summary>
-        <p>GitHub works: the kit reads the host from your <code>origin</code> remote and does every MR step through <code>gh</code>, with pull requests, checks and review threads. Linear isn't supported yet; it's next on the roadmap.</p></details>
+        <p>GitHub works: the kit reads the host from your <code>origin</code> remote and does every MR step through <code>gh</code>, with pull requests, checks and review threads. Linear works too: write <code>linear</code> in <code>.agent/tracker.txt</code>; a <code>Bug</code> label or a sub-issue takes the quick track.</p></details>
       <details><summary>My stack isn't FastAPI + React.</summary>
         <p>The workflow, tracks, hook and guards are stack-agnostic. Point the standards files and the backend and frontend check scripts at your own linters and test runners.</p></details>
     </div>
@@ -657,7 +657,7 @@ chmod +x path/to/your-repo/.cursor/skills/*/scripts/*.sh</code></pre><button cla
 <section class="closing grid-bg" aria-labelledby="c-h">
   <div class="wrap">
     <h2 id="c-h">It never merges. <span class="ok">You do.</span></h2>
-    <p class="sub">Jira ticket in. Reviewed MR out. Scripts decide when it's done.</p>
+    <p class="sub">Ticket in. Reviewed MR out. Scripts decide when it's done.</p>
     <div class="install">
       <code>git clone https://github.com/aniketshukla1/sdlc-kit.git</code>
       <button class="copy" type="button" data-copy aria-label="Copy the clone command"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><span class="lbl">Copy</span></button>

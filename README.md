@@ -2,14 +2,14 @@
 
 # sdlc-kit
 
-### Jira ticket in. Reviewed MR out. Scripts decide when it's done.
+### Ticket in. Reviewed MR out. Scripts decide when it's done.
 
 A drop-in kit for Cursor, Claude Code and Codex that turns an AI coding agent into a teammate you can hand real tickets to.<br>
 It plans before it codes, writes failing tests first, and can't say "done" until real check scripts agree.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e)](LICENSE)
 ![Agents](https://img.shields.io/badge/agents-Cursor%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex-111827)
-![Jira](https://img.shields.io/badge/Jira-ticket%20in-0052CC)
+![Ticket in](https://img.shields.io/badge/ticket%20in-Jira%20%C2%B7%20Linear-0052CC)
 ![MR out](https://img.shields.io/badge/MR%20out-GitLab%20%C2%B7%20GitHub-FC6D26)
 ![Self-tests](https://img.shields.io/badge/self--tests-77%2F77%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
@@ -63,11 +63,12 @@ already on `main`, stubs left over from test-first, and swallowed errors.
 
 ## How it works
 
-The Jira issue type picks the track, so small tickets stay small:
+The ticket's type picks the track, so small tickets stay small. Linear has no issue types, so there a `Bug` label or
+a sub-issue takes the quick track:
 
 ```mermaid
 flowchart TD
-    T([Jira ticket]) --> K{Issue type}
+    T([Ticket]) --> K{Issue type}
     K -->|"Bug, Sub-task"| Q["Quick track · 1 chat<br/>failing test → root cause"]
     K -->|"Story, Feature, Enhancement, Task"| F["Full track<br/>intake → explore → plan"]
     Q --> A1{{You approve the fix}}
@@ -80,7 +81,7 @@ flowchart TD
     M --> Y{{You review and merge}}
 ```
 
-| Track | Jira types | Chats to the MR | What happens |
+| Track | Ticket types | Chats to the MR | What happens |
 |---|---|---|---|
 | **Quick** | Bug, Sub-task | 1 | A failing test reproduces the bug, the agent finds the root cause (and checks every caller), you approve a ten-line plan, it fixes, checks and opens the MR |
 | **Full** | Story, New Feature, Improvement, Enhancement, Task | 7 | Intake → explore → plan → **you approve** → red → green per task → checks → self-review → MR |
@@ -101,7 +102,7 @@ stopped.
 | 4 | Build | `/write-tests` (red), then `/db-migration`, `/backend-implement` or `/frontend-implement` (green) | Every task ticked, its tests green |
 | 5 | Check | `/run-checks` | `ALL PASS` |
 | 6 | Self-review | `/self-review` | Findings fixed, `ALL PASS` again |
-| 7 | MR | `/gitlab-mr` | MR open, linked in Jira |
+| 7 | MR | `/gitlab-mr` | MR open, linked on the ticket |
 | 8 | Feedback | `/mr-feedback` | Pipeline green, every review thread handled |
 
 </details>
@@ -109,7 +110,7 @@ stopped.
 ## Quick start
 
 You need Cursor, Claude Code or Codex, GitLab with [`glab`](https://gitlab.com/gitlab-org/cli) or GitHub with
-[`gh`](https://cli.github.com), a Jira MCP server, `git`, `python3` and
+[`gh`](https://cli.github.com), a Jira or Linear MCP server, `git`, `python3` and
 `ripgrep`. The standards target FastAPI + SQLAlchemy + MySQL + React/TypeScript; other stacks mostly mean editing
 paths ([see below](#adapt-it-to-your-stack)).
 
@@ -123,9 +124,10 @@ paths ([see below](#adapt-it-to-your-stack)).
    The `.claude/` and `.agents/` folders link to `.cursor/`, so there is one copy of every rule and skill. Copy only
    the folders for the agents your team uses: Cursor also reads `.claude/skills` and `.agents/skills`. Already have an
    `AGENTS.md`? Append ours to it. On Windows, turn on symlinks (`git config core.symlinks true`) before you clone.
-2. **Connect your tools:** run `glab auth login` (GitHub: `gh auth login`), add your Jira MCP server to your agent,
-   and put your Jira project key in `.agent/jira-project.txt`. The kit reads GitLab or GitHub from your `origin`
-   remote; if that's wrong, write `gitlab` or `github` in `.agent/git-host.txt`.
+2. **Connect your tools:** run `glab auth login` (GitHub: `gh auth login`) and add your tracker's MCP server to your
+   agent (Linear's is `https://mcp.linear.app/mcp`). Put your Jira project key, or Linear team key, in
+   `.agent/jira-project.txt`; on Linear, also write `linear` in `.agent/tracker.txt`. The kit reads GitLab or GitHub
+   from your `origin` remote; if that's wrong, write `gitlab` or `github` in `.agent/git-host.txt`.
 3. **Trust the workspace** when your agent asks (project hooks only run in trusted workspaces). Then prove the hook
    works: ask the agent to run `git push --force --dry-run`. It must be blocked. Codex has no hook in this kit yet, so
    your protected branches are its gate.
@@ -147,7 +149,7 @@ paths ([see below](#adapt-it-to-your-stack)).
 | Every next chat | `Continue PROJ-123` |
 | The MR got reviewed, or the pipeline finished | New chat: `Continue PROJ-123` |
 | Next sub-task of a roadmap | `Continue PROJ-123` (the parent): it starts the next sub-task that's ready, or says which MR it's waiting for |
-| Write a new ticket | `Create a Jira bug: <what happened>` (or enhancement, task, sub-task). You type `create` |
+| Write a new ticket | `Create a bug: <what happened>` (or enhancement, task, sub-task). You type `create` |
 | Review someone's MR | `Review MR !45` or `Review PROJ-123`. You type `post` |
 | QA a ticket | `QA PROJ-123`. You type `post` |
 | The MR got merged | Nothing. Your CI takes it from there |
@@ -165,7 +167,7 @@ Any skill also runs on its own: `/run-checks`, `/self-review`, `/mr-review`, and
 .claude/          Claude Code: settings.json runs the same hook; rules/ and skills/ link to .cursor/
 .agents/skills/   Codex: links to .cursor/skills/
 AGENTS.md         Codex: points at the rules, the skills and the checks
-.agent/           size allowlist, guard exceptions, Jira project key; work/ holds per-ticket state (gitignored)
+.agent/           size allowlist, guard exceptions, tracker and project key; work/ holds per-ticket state (gitignored)
 docs/             the audit and the skills review behind the design (this repo only)
 ```
 
@@ -180,12 +182,12 @@ docs/             the audit and the skills review behind the design (this repo o
 | `/frontend-implement` | Phase 4, green | React + TypeScript + shadcn/ui, with loading, empty, error and success states |
 | `/run-checks` | Phase 5 | Runs `check_all.sh`: one `ALL PASS` or `FAIL` |
 | `/self-review` | Phase 6 | Reviews the diff in a fresh chat: correctness, readability, architecture, security, performance |
-| `/gitlab-mr` | Phase 7 | Explicit `git add`, typed commits, the MR from a template with a Proof section from `proof_pack.sh`, a Jira comment |
+| `/gitlab-mr` | Phase 7 | Explicit `git add`, typed commits, the MR from a template with a Proof section from `proof_pack.sh`, a comment on the ticket |
 | `/mr-feedback` | Phase 8 | Fixes failed jobs, handles unresolved threads, merges `main` on conflicts (never rebases) |
 | `/quick-fix` | Bug, Sub-task | The whole quick track in one chat |
-| `/jira-create` | Anytime | Writes a detailed ticket from one sentence, using your team's templates per issue type |
+| `/jira-create` | Anytime | Writes a detailed Jira or Linear ticket from one sentence, using your team's templates per issue type |
 | `/mr-review` | Code review | Reviews any MR against its ticket; posts severity-labelled threads after you type `post` |
-| `/ticket-qa` | QA | A pass/fail plan from the acceptance criteria, local runs with evidence, the result posted to Jira |
+| `/ticket-qa` | QA | A pass/fail plan from the acceptance criteria, local runs with evidence, the result posted to the ticket |
 
 ## Guardrails
 
@@ -354,8 +356,9 @@ are plain Markdown and the checks are plain shell.
 
 GitHub works: the kit reads the host from your `origin` remote (or `.agent/git-host.txt`), and
 `.cursor/skills/mr-feedback/scripts/mr.sh` does every MR step through `glab` or `gh`: pull requests, checks and
-review threads. The skill names stay the same, so `/gitlab-mr` opens a pull request on GitHub. Linear isn't
-supported yet: the ticket skills use a Jira MCP server. It's next on the [roadmap](#roadmap).
+review threads. The skill names stay the same, so `/gitlab-mr` opens a pull request on GitHub. Linear works too:
+write `linear` in `.agent/tracker.txt` and add Linear's MCP server. Linear has no issue types, so a `Bug` label or a
+sub-issue takes the quick track, sub-issues work like sub-tasks, and `/jira-create` uses labels instead of types.
 
 </details>
 
@@ -376,7 +379,7 @@ Ideas on the table, not promises. Open an issue to vote or to pick one up.
 - [x] Packaging for Claude Code and Codex (`.claude/`, `.agents/`, `AGENTS.md`)
 - [ ] A command guard for Codex (its experimental `.codex/rules`)
 - [ ] More stacks: Django, Next.js, Spring
-- [ ] Linear as a ticket source
+- [x] Linear as a ticket source
 - [ ] Changed-line coverage and mutation testing in CI
 - [ ] Ready-made recipes for the Chrome DevTools checks
 

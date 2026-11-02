@@ -1,6 +1,6 @@
 ---
 name: ticket-qa
-description: QA for a Jira ticket. Turns its acceptance criteria into a pass/fail plan (golden path, edge cases, errors, compatibility), runs what it can locally, gives the human exact steps for the rest, records evidence, and posts the result to Jira after the human types post. Use when asked to QA, test or verify a Jira ticket or its MR.
+description: QA for a ticket (Jira or Linear). Turns its acceptance criteria into a pass/fail plan (golden path, edge cases, errors, compatibility), runs what it can locally, gives the human exact steps for the rest, records evidence, and posts the result to the ticket after the human types post. Use when asked to QA, test or verify a ticket or its MR.
 ---
 # Ticket QA
 
@@ -8,7 +8,7 @@ QA checks what is true for a user after the change; the MR's tests check the cod
 You run things locally only. Testing, Staging and Production are for the human (hard rule 6).
 
 ## Steps
-1. Fetch the ticket (Jira MCP): acceptance criteria and comments (a sub-task: also its parent). Find its MR
+1. Fetch the ticket (the tracker's MCP): acceptance criteria and comments (a sub-task: also its parent). Find its MR
    (`bash .cursor/skills/mr-feedback/scripts/mr.sh find <KEY>`, the title starting with `<KEY>:`) and read the
    MR's AC table.
 2. Write `.agent/work/<KEY>/QA.md` from `qa-template.md` (next to this file):
@@ -29,7 +29,7 @@ You run things locally only. Testing, Staging and Production are for the human (
    row means `QA failed`, unless the human waives it with a follow-up ticket.
 7. Show QA.md, and offer /jira-create for each failure (a Bug linked to <KEY>). Then write exactly:
    `Reply "post" or "changes: <feedback>".` STOP.
-8. On `post`: post the Result section as ONE Jira comment on <KEY> (MCP). Then `git switch -`.
+8. On `post`: post the Result section as ONE comment on <KEY> (MCP). Then `git switch -`.
 
 ## Done when
 - [ ] Every acceptance criterion has a row, and every Coverage line is filled or `N/A: <why>`

@@ -1,6 +1,6 @@
 ---
 name: gitlab-mr
-description: Phase 7. Commits, rebases, pushes the branch and opens the merge request (a pull request on GitHub), then links it in Jira. Use after self-review is done and run-checks prints ALL PASS.
+description: Phase 7. Commits, rebases, pushes the branch and opens the merge request (a pull request on GitHub), then links it on the ticket. Use after self-review is done and run-checks prints ALL PASS.
 ---
 # Open the MR (phase 7)
 
@@ -27,11 +27,11 @@ description: Phase 7. Commits, rebases, pushes the branch and opens the merge re
    Verify: it prints a URL ending in `/merge_requests/<IID>` or `/pull/<IID>`. The IID is that number.
 10. Save MR URL and IID in PROGRESS.md. Set `Phase: 7-mr (open)`.
    PROGRESS.md has `Parent: <KEY>`? Also set this sub-task's row in that parent's Roadmap (its PLAN.md) to `MR !<IID>`.
-11. Post a Jira comment (MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.
+11. Post a comment (tracker MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.
 12. Tell the human: `MR created: <url>. After review or a pipeline result, start a new chat and type: Continue <KEY>`.
 
 ## Done when
 - [ ] Only planned files committed, commit messages follow the format
 - [ ] Branch pushed without force, MR created against `main`
 - [ ] The MR's Proof section is `proof_pack.sh` output for the pushed head, unedited
-- [ ] MR URL in PROGRESS.md and Jira
+- [ ] MR URL in PROGRESS.md and on the ticket

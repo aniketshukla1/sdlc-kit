@@ -1,5 +1,5 @@
-## Jira
-<KEY>: <jira url>
+## Ticket
+<KEY>: <ticket url>
 Parent: <the Parent key in PROGRESS.md, or None>
 
 ## Summary

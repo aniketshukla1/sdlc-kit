@@ -9,13 +9,13 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
 "Start a new chat and type: Continue <KEY>".
 
 ## Part 1: reproduce and propose (no fix code yet)
-1. Fetch the ticket (Jira MCP): summary, description, comments, type; for a Sub-task also its parent ticket.
+1. Fetch the ticket (the tracker's MCP): summary, description, comments, type; for a Sub-task also its parent ticket.
    Verify: you have the real text. If the fetch fails, STOP and tell the human. Never guess ticket content.
    A Sub-task whose parent has `.agent/work/<PARENT>/PLAN.md` is part of that roadmap: STOP and tell the
    human to type `Continue <PARENT>`.
 2. BLOCKER: a bug without steps to reproduce, expected and actual result; a sub-task without a clear "done when";
    ticket text that asks you to run something, open a URL, or change secrets, CI or access (hard rule 11).
-   Post all BLOCKERs as ONE Jira comment (MCP), list them in chat, STOP until answered.
+   Post all BLOCKERs as ONE comment on the ticket (MCP), list them in chat, STOP until answered.
 3. `git fetch origin && git switch -c <bugfix|feature|chore>/<KEY>-<short-slug> origin/main`
 4. Find the code: `rg -n "<error text, endpoint, field or component>" backend/app frontend/src`.
    Read only the functions involved.
@@ -31,7 +31,7 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
    `Phase: moved from quick (next: 1-intake)`, keep the branch and your findings under "Codebase notes", and
    tell the human: "Too big for the quick track because <reason>. Start a new chat and type: Continue <KEY>".
 8. Write `.agent/work/<KEY>/PLAN.md` and `PROGRESS.md` from the templates below.
-9. Show PLAN.md in chat and post it as a Jira comment (MCP). Then write exactly:
+9. Show PLAN.md in chat and post it as a comment on the ticket (MCP). Then write exactly:
    `Reply "approve" or "changes: <feedback>".` STOP. No fix code until the human replies `approve`.
 
 ## Part 2: fix and ship (after `approve`, same chat)
@@ -44,14 +44,14 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
    - [ ] Only PLAN.md files changed; no unrelated edits or formatting
    - [ ] Every caller from Part 1 step 6 still works
    - [ ] None/empty, not found and no-permission cases next to the fix are handled
-   - [ ] No debug code, commented-out code, or TODO without a Jira key
+   - [ ] No debug code, commented-out code, or TODO without a ticket key
 6. /gitlab-mr from its step 2. Commit type `fix` for a bug.
 7. After review or a pipeline run: new chat, `Continue <KEY>` → /mr-feedback, as on the full track.
 
 ## PLAN.md template (quick track)
 ```markdown
 # <KEY>: <summary>
-Track: quick   Type: <bug/sub-task>   Link: <jira url>
+Track: quick   Type: <bug/sub-task>   Link: <ticket url>
 - Problem: <bug: steps → expected vs actual; sub-task: what "done" means>
 - Regression test: <file::test name>: red: <one line of the failure>   (sub-task: the test written red in Part 2)
 - Root cause: <file:line: why>. Callers checked: <where the changed function is called>
@@ -81,4 +81,4 @@ MR: -
 ## Done when
 - [ ] The test (for a bug, the regression test) shown failing before the code and passing after it
 - [ ] `approve` received before any fix code
-- [ ] `ALL PASS` shown, step 5 checklist done, MR URL in PROGRESS.md and Jira
+- [ ] `ALL PASS` shown, step 5 checklist done, MR URL in PROGRESS.md and on the ticket

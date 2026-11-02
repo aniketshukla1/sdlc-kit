@@ -40,7 +40,7 @@ Quality
 - [ ] No code left unused by this change (list it and ask before deleting); no abstraction with one user
 - [ ] No generic names (`data`, `result`, `temp`), boolean flag parameters or nested ternaries
 - [ ] Code you deleted but didn't write: you found out why it existed first (`git log -L` or blame)
-- [ ] No debug code, commented-out code, or TODO without a Jira key
+- [ ] No debug code, commented-out code, or TODO without a ticket key
 
 ## Done when
 - [ ] Every checklist item checked for every file

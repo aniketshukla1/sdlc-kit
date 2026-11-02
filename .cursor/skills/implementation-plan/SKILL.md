@@ -34,7 +34,7 @@ description: Phase 3. Writes PLAN.md with vertical-slice tasks, edge and abuse c
 6. Anything a human must do (ES mapping, env var, data backfill, infra) goes in "Human actions required".
    The Risks "Ask first" items (a new feature flag included) are approved by the human with the plan.
    A new library or pattern, in a project that keeps ADRs: add a task for a short one, in its format.
-7. Show the plan summary in chat and post PLAN.md as a Jira comment (MCP). Then write exactly:
+7. Show the plan summary in chat and post PLAN.md as a comment on the ticket (MCP). Then write exactly:
    `Reply "approve" or "changes: <feedback>".`
    STOP. Write no code until the human replies `approve`.
 8. On `changes: ...` → update PLAN.md and repeat step 7.

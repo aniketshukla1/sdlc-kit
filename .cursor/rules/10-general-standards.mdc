@@ -32,7 +32,7 @@ Before editing a file: `wc -l <file>`. If your change would exceed the limit, sp
 ## Code hygiene
 - No magic numbers/strings: use named constants or enums.
 - No commented-out code, no `print`, no `console.log`, no `debugger`.
-- `TODO` only with a Jira key: `# TODO(PROJ-123): ...`.
+- `TODO` only with a ticket key: `# TODO(PROJ-123): ...`.
 - Never swallow errors. No bare `except:`; catch specific exceptions; no empty `catch {}`.
 - Config and secrets come from settings/env. Never hardcode URLs, credentials, tokens.
 - Comments explain WHY, not WHAT. Public functions get a one-line docstring/JSDoc.

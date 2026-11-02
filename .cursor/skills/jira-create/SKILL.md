@@ -1,18 +1,22 @@
 ---
 name: jira-create
-description: Writes a detailed Jira ticket from a short prompt, using the template for its type (Bug, Enhancement, Improvement, Story, New Feature, Task, Sub-task), and creates it through the Jira MCP server after the human types create. Use when someone asks to create, write or file a Jira ticket, bug, enhancement, task or sub-task.
+description: Writes a detailed ticket (Jira or Linear) from a short prompt, using the template for its type (Bug, Enhancement, Improvement, Story, New Feature, Task, Sub-task), and creates it through the tracker's MCP server after the human types create. Use when someone asks to create, write or file a ticket, issue, bug, enhancement, task or sub-task.
 ---
-# Create a Jira ticket
+# Create a ticket (Jira or Linear)
 
-Needs: the Jira MCP server (README setup step 4) with permission to create issues in the project.
-Its tools aren't available → STOP and say so. Never write to Jira any other way.
+Needs: the tracker's MCP server (README quick start step 2) with permission to create issues. The tracker is
+Jira, or Linear when `.agent/tracker.txt` says `linear`. Its tools aren't available → STOP and say so. Never
+write to the tracker any other way.
 
 ## Steps
 1. Type: from the prompt. Unclear → ask. Epic or Spike → say this skill doesn't cover them, and stop.
-2. Project key: from the prompt, else the line in `.agent/jira-project.txt` that isn't a comment. Neither → ask.
-3. Before the first create in this chat, read the Jira MCP tools: which one creates an issue, its parameter
+   Linear has no issue types: the type becomes a label that exists in the team, and a Sub-task a sub-issue.
+2. Project key (Linear: team key): from the prompt, else the line in `.agent/jira-project.txt` that isn't a
+   comment. Neither → ask.
+3. Before the first create in this chat, read the tracker's MCP tools: which one creates an issue, its parameter
    names, and the description format it expects. Use exactly those; never guess a tool or field name.
-   Then look up the project's issue types, priorities and components. Use only values that exist.
+   Then look up what the project uses (Jira: issue types, priorities, components; Linear: the team's labels,
+   priorities, projects). Use only values that exist.
 4. Open the template for the type (next to this file) and fill it in from the prompt:
    | Type | Template |
    |------|----------|
@@ -39,7 +43,8 @@ Its tools aren't available → STOP and say so. Never write to Jira any other wa
    Human Actions.
 9. Show the full draft: type, project, summary, priority, components, labels, the description, and each
    sub-task. Then write exactly: `Reply "create" or "changes: <feedback>".` STOP. Create nothing before `create`.
-10. On `create`: create the ticket. For a Task, then create each sub-task with the new key as its parent.
+10. On `create`: create the ticket. For a Task, then create each sub-task (Linear: sub-issue) with the new key as
+    its parent.
     Verify: every create returns a key. A create fails → show the error; don't retry with other fields.
 11. Reply with each key and its link.
 

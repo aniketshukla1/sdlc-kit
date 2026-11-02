@@ -1,6 +1,6 @@
 # sdlc-kit
 
-This repo uses the sdlc-kit ticket workflow: a Jira ticket in, a reviewed merge request out (GitLab or GitHub). The kit's
+This repo uses the sdlc-kit ticket workflow: a Jira or Linear ticket in, a reviewed merge request out (GitLab or GitHub). The kit's
 rules, skills and scripts live in `.cursor/`, whichever agent you are.
 
 Before any ticket work, read and follow:

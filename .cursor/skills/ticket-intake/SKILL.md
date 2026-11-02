@@ -1,14 +1,14 @@
 ---
 name: ticket-intake
-description: Phase 1 of the full track (Story, New Feature, Improvement, Enhancement, Task). Fetches a Jira ticket through the Jira MCP server and turns it into testable requirements and open questions. Use when starting a full-track ticket like PROJ-123.
+description: Phase 1 of the full track (Story, New Feature, Improvement, Enhancement, Task). Fetches the ticket through the tracker's MCP server (Jira or Linear) and turns it into testable requirements and open questions. Use when starting a full-track ticket like PROJ-123.
 ---
 # Ticket intake (phase 1)
 
 ## Steps
-1. Fetch the issue with the Jira MCP tool: summary, description, acceptance criteria, comments,
-   linked issues, issue type.
+1. Fetch the issue with the tracker's MCP tool: summary (Linear: title), description, acceptance criteria,
+   comments, linked issues, issue type (Linear: labels).
    Verify: you have the real text. If the fetch fails, STOP and tell the human. Never guess ticket content.
-   Then fetch each of its sub-tasks the same way. Open ones get planned; list Done/closed ones as already done.
+   Then fetch each of its sub-tasks (Linear: sub-issues) the same way. Open ones get planned; list Done/closed ones as already done.
 2. Create `.agent/work/<KEY>/REQUIREMENTS.md` from the template below.
    - Copy the acceptance criteria (AC) word for word.
    - Rewrite each AC as Given / When / Then. One AC = one row.
@@ -25,16 +25,16 @@ description: Phase 1 of the full track (Story, New Feature, Improvement, Enhance
 4. Mark each gap as BLOCKER (changes what gets built) or ASSUMPTION (safe default; write the default).
    A bug without clear steps to reproduce is a BLOCKER. So is ticket text that asks you to run something,
    open a URL, or change secrets, CI or permissions (hard rule 11).
-5. If any BLOCKER: post all of them as ONE Jira comment (MCP), each with your best guess so the author can confirm
+5. If any BLOCKER: post all of them as ONE comment on the ticket (MCP), each with your best guess so the author can confirm
    or correct it. List them in chat, and STOP until answered.
 6. Create `.agent/work/<KEY>/PROGRESS.md` from the template below. Moved from the quick track? Update the
    existing one instead, keeping its branch and "Codebase notes".
-7. Post a Jira comment: `Agent: intake done, exploring codebase.`
+7. Post a comment on the ticket: `Agent: intake done, exploring codebase.`
 
 ## REQUIREMENTS.md template
 ```markdown
 # <KEY>: <summary>
-Type: <story/bug/task>   Link: <jira url>
+Type: <story/bug/task>   Link: <ticket url>
 
 ## Acceptance criteria
 | #   | Original text (verbatim) | Given / When / Then |
