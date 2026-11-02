@@ -1,8 +1,8 @@
 ---
 name: gitlab-mr
-description: Phase 7. Commits, rebases, pushes the branch and opens a GitLab merge request with glab, then links it in Jira. Use after self-review is done and run-checks prints ALL PASS.
+description: Phase 7. Commits, rebases, pushes the branch and opens the merge request (a pull request on GitHub), then links it in Jira. Use after self-review is done and run-checks prints ALL PASS.
 ---
-# GitLab MR (phase 7)
+# Open the MR (phase 7)
 
 ## Steps
 1. Run /run-checks now. Continue only on `ALL PASS`.
@@ -21,14 +21,10 @@ description: Phase 7. Commits, rebases, pushes the branch and opens a GitLab mer
    commit any fix, push, and run it again. Never write or edit the proof by hand.
 8. Fill `mr-template.md` (next to this file) into `.agent/work/<KEY>/MR.md`. Every section, or `None`.
    The Proof section is `proof.md`, pasted unedited.
-9. Create the MR:
-   ```
-   glab mr create --source-branch "$(git branch --show-current)" --target-branch main \
-     --title "<KEY>: <summary>" --description "$(cat .agent/work/<KEY>/MR.md)" \
-     --remove-source-branch --yes
-   ```
-   Add `--draft` if "Human actions required" is not `None`.
-   Verify: the command prints an MR URL ending in `/merge_requests/<IID>`. The IID is that number.
+9. Create the MR (GitLab or GitHub; `mr.sh` picks the host):
+   `bash .cursor/skills/mr-feedback/scripts/mr.sh create "<KEY>: <summary>" .agent/work/<KEY>/MR.md`
+   Add `--draft` at the end if "Human actions required" is not `None`.
+   Verify: it prints a URL ending in `/merge_requests/<IID>` or `/pull/<IID>`. The IID is that number.
 10. Save MR URL and IID in PROGRESS.md. Set `Phase: 7-mr (open)`.
    PROGRESS.md has `Parent: <KEY>`? Also set this sub-task's row in that parent's Roadmap (its PLAN.md) to `MR !<IID>`.
 11. Post a Jira comment (MCP) on the ticket, and on its parent if it has one: `Agent: MR ready for review: <url>`.

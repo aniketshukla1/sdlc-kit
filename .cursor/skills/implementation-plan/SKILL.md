@@ -50,7 +50,8 @@ After `approve`, <KEY> itself gets no branch or MR. Each open sub-task gets its 
 Each sub-task's MR leaves main working: user-visible parts of an unfinished ticket go behind the project's
 existing feature flag, if it has one (decide this at planning).
 Also run these steps on every "Continue <KEY>" while the Roadmap has rows that aren't `merged`.
-1. For each `MR !<iid>` row: `glab mr view <iid>` says it's merged → set the row to `merged`.
+1. For each `MR !<iid>` row: `bash .cursor/skills/mr-feedback/scripts/mr.sh view <iid>` says it's merged → set
+   the row to `merged`.
 2. Pick the next `todo` row whose "Depends on" rows are all `merged`. None ready → tell the human which MR
    it is waiting for, and stop. Every row `merged` → the ticket is done; tell the human.
 3. Create `.agent/work/<SUBKEY>/PLAN.md` from the template below: copy that row's plan tasks, their files and

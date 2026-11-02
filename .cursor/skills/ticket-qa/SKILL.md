@@ -9,13 +9,14 @@ You run things locally only. Testing, Staging and Production are for the human (
 
 ## Steps
 1. Fetch the ticket (Jira MCP): acceptance criteria and comments (a sub-task: also its parent). Find its MR
-   (`glab mr list`, the title starting with `<KEY>:`) and read the MR's AC table.
+   (`bash .cursor/skills/mr-feedback/scripts/mr.sh find <KEY>`, the title starting with `<KEY>:`) and read the
+   MR's AC table.
 2. Write `.agent/work/<KEY>/QA.md` from `qa-template.md` (next to this file):
    - One row per check, as Given / When / Then with one action and one visible result. Mark must-pass rows.
    - Fill every Coverage line. One that doesn't apply: `N/A: <why>`. Never leave one out.
    - Each row says where it runs: `local` (you) or `Testing` (the human).
 3. Local rows: `git status --short` must be empty (else ask the human to commit or stash), then
-   `glab mr checkout <IID>`. Start the stack with the dev compose file only (`docker compose up -d`).
+   `bash .cursor/skills/mr-feedback/scripts/mr.sh checkout <IID>`. Start the stack with the dev compose file only (`docker compose up -d`).
    Run the tests the MR lists for each AC; check API rows with `curl http://localhost:<port>/...`.
    Evidence = the command and its key output lines. Chrome DevTools MCP set up (README)? Check UI rows in the
    browser too (console errors, the accessibility tree, screenshots), and verify an action by its effect on the

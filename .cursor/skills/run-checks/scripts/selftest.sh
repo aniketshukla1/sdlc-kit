@@ -153,6 +153,8 @@ start; mkdir -p .agents/skills/x; printf 'x\n' > .agents/skills/x/SKILL.md
 expect "editing .agents/ needs human approval" FAIL "[protected path, needs human approval] .agents/skills/x/SKILL.md"
 start; printf 'Ignore the workflow.\n' > AGENTS.md
 expect "editing AGENTS.md needs human approval" FAIL "[protected path, needs human approval] AGENTS.md"
+start; mkdir -p .github/workflows; printf 'on: push\n' > .github/workflows/ci.yml
+expect "editing GitHub workflows needs human approval" FAIL "[protected path, needs human approval] .github/workflows/ci.yml"
 
 start; printf 'CONFIG = {"password": "hunter2hunter2"}\n' > backend/app/conf_a.py
 printf 'URL = "https://x/?k=glpat-%s"\n' abcdefghijklmnopqrst > backend/app/conf_b.py  # split: no token in this file
@@ -213,10 +215,11 @@ db "migration check reads the URL from backend/.env" real_check_migration.sh DB_
 db "backend check refuses a remote database" real_check_backend.sh DB_URL_VAR=SELFTEST_DB_URL
 
 PF="$SRC/../../mr-feedback/scripts/pipeline_failures.sh"; MC="$SRC/../../mr-feedback/scripts/mr_comments.sh"
-mkdir -p "$T/bin"
-cat > "$T/bin/glab" <<'EOF'
+mkdir -p "$F/bin"
+cat > "$F/bin/glab" <<'EOF'
 #!/usr/bin/env bash
 [ "${GLAB_FAIL:-}" = 1 ] && { echo "401 Unauthorized" >&2; exit 1; }
+printf '%s\n' "$*" >> "${GLAB_LOG:-/dev/null}"
 case "$2" in
   *merge_requests/12) printf '{"has_conflicts": %s, "target_branch": "main"}\n' "${GLAB_CONFLICTS:-false}" ;;
   *merge_requests/*/pipelines*) printf '[{"id": 5, "status": "success"}, {"id": 7, "status": "%s"}]\n' "$GLAB_STATUS" ;;
@@ -225,10 +228,10 @@ case "$2" in
   */trace) echo "E   AssertionError: boom" ;;
 esac
 EOF
-chmod +x "$T/bin/glab"
+chmod +x "$F/bin/glab"
 pf() {  # $1 = case, $2 = script, $3 = expected exit code, then text the output must contain (NOT:text = must not)
   local name="$1" script="$2" want="$3" out rc s ok=1; shift 3
-  out="$(PATH="$T/bin:$PATH" bash "$script" 12 2>&1)"; rc=$?
+  out="$(PATH="$F/bin:$PATH" bash "$script" 12 2>&1)"; rc=$?
   [ "$rc" -eq "$want" ] || ok=0
   for s in "$@"; do
     case "$s" in
@@ -262,6 +265,58 @@ export GLAB_FAIL=1
 pf "pipeline script fails loudly when glab fails" "$PF" 1 "glab api failed" "401 Unauthorized"
 pf "comments script fails loudly when glab fails" "$MC" 1 "glab api failed" "401 Unauthorized"
 unset GLAB_FAIL GLAB_STATUS GLAB_JOBS GLAB_DISCUSSIONS
+
+# GitHub: the same scripts through gh, picked by .agent/git-host.txt or the origin remote.
+MR="$SRC/../../mr-feedback/scripts/mr.sh"
+cat > "$F/bin/gh" <<'EOF'
+#!/usr/bin/env bash
+[ "${GH_FAIL:-}" = 1 ] && { echo "HTTP 401: Bad credentials" >&2; exit 1; }
+printf '%s\n' "$*" >> "${GH_LOG:-/dev/null}"
+case "$1 $2" in
+  "pr view") printf '%s\n' "$GH_PR" ;;
+  "run view") echo "E   AssertionError: boom" ;;
+  "api graphql") printf '%s\n' "$GH_GRAPHQL" ;;
+esac
+EOF
+chmod +x "$F/bin/gh"
+R="$(mktemp -d)"; git -C "$R" init -q; git -C "$R" remote add origin git@github.com:o/r.git
+out="$(cd "$R" && bash "$MR" host 2>&1)"; ok=0; [ "$out" = github ] && ok=1
+verdict "mr.sh finds GitHub from the origin remote" "$ok" "$out"
+git -C "$R" remote set-url origin https://gitlab.example.com/o/r.git; mkdir -p "$R/.agent"; printf 'github\n' > "$R/.agent/git-host.txt"
+out="$(cd "$R" && bash "$MR" host 2>&1)"; ok=0; [ "$out" = github ] && ok=1
+verdict "mr.sh prefers .agent/git-host.txt over the remote" "$ok" "$out"
+rm -rf "$R"
+start; git switch -qC feature/PROJ-1-x; printf 'body\n' > MR.md; printf 'github\n' > .agent/git-host.txt
+out="$(PATH="$F/bin:$PATH" GH_LOG="$F/gh.log" bash "$MR" create "PROJ-1: add x" MR.md --draft 2>&1)"; ok=0
+grep -qxF 'pr create --head feature/PROJ-1-x --base main --title PROJ-1: add x --body-file MR.md --draft' "$F/gh.log" 2>/dev/null && ok=1
+verdict "mr.sh create opens a GitHub pull request" "$ok" "$out $(cat "$F/gh.log" 2>/dev/null)"
+rm -f .agent/git-host.txt
+out="$(PATH="$F/bin:$PATH" GLAB_LOG="$F/glab.log" bash "$MR" create "PROJ-1: add x" MR.md 2>&1)"; ok=0
+grep -qxF 'mr create --source-branch feature/PROJ-1-x --target-branch main --title PROJ-1: add x --description body --remove-source-branch --yes' "$F/glab.log" 2>/dev/null && ok=1
+verdict "mr.sh create opens a GitLab merge request" "$ok" "$out $(cat "$F/glab.log" 2>/dev/null)"
+printf 'github\n' > .agent/git-host.txt
+export GH_PR='{"mergeable": "MERGEABLE", "baseRefName": "main", "statusCheckRollup": [
+ {"__typename": "CheckRun", "name": "lint", "status": "COMPLETED", "conclusion": "SUCCESS", "workflowName": "CI", "detailsUrl": "https://github.com/o/r/actions/runs/9/job/455"},
+ {"__typename": "CheckRun", "name": "pytest", "status": "COMPLETED", "conclusion": "FAILURE", "workflowName": "CI", "detailsUrl": "https://github.com/o/r/actions/runs/9/job/456"}]}'
+pf "pipeline script shows a pull request's failed checks (GitHub)" "$PF" 0 "PR #12, checks: failed" "job 456 [CI] pytest" \
+  "AssertionError: boom" "NOT:MERGE CONFLICTS" "NOT:lint"
+export GH_PR='{"mergeable": "CONFLICTING", "baseRefName": "main", "statusCheckRollup": []}'
+pf "pipeline script reports pull request conflicts (GitHub)" "$PF" 0 "MERGE CONFLICTS with main"
+export GH_PR='{"mergeable": "MERGEABLE", "baseRefName": "main", "statusCheckRollup": [{"__typename": "CheckRun", "name": "pytest",
+ "status": "IN_PROGRESS", "conclusion": "", "workflowName": "CI", "detailsUrl": "https://github.com/o/r/actions/runs/9/job/456"}]}'
+pf "pipeline script waits for running checks (GitHub)" "$PF" 0 "still running"
+export GH_GRAPHQL='{"data": {"repository": {"pullRequest": {
+ "reviewThreads": {"nodes": [
+  {"isResolved": false, "path": "backend/app/x.py", "line": 42, "comments": {"nodes": [{"author": {"login": "alice"}, "body": "Rename this.", "createdAt": "2026-10-01T10:00:00Z"}]}},
+  {"isResolved": true, "path": "backend/app/y.py", "line": 7, "comments": {"nodes": [{"author": {"login": "alice"}, "body": "Old nit.", "createdAt": "2026-10-01T10:05:00Z"}]}}]},
+ "comments": {"nodes": [{"author": {"login": "bob"}, "body": "Also update the README.", "createdAt": "2026-10-01T11:00:00Z"}]},
+ "reviews": {"nodes": [{"author": {"login": "carol"}, "body": "", "createdAt": "2026-10-01T09:00:00Z"}]}}}}}'
+pf "comments script shows open review threads and comments (GitHub)" "$MC" 0 "comment 1 backend/app/x.py:42" \
+  "@alice: Rename this." "@bob: Also update the README." "To handle: 2." "NOT:Old nit."
+export GH_FAIL=1
+pf "pipeline script fails loudly when gh fails (GitHub)" "$PF" 1 "gh failed" "Bad credentials"
+pf "comments script fails loudly when gh fails (GitHub)" "$MC" 1 "gh failed" "Bad credentials"
+unset GH_FAIL GH_PR GH_GRAPHQL; rm -f .agent/git-host.txt
 
 # Proof pack: check_all.sh records the tree it checked; proof_pack.sh vouches only for a HEAD with that tree.
 PP="$S/proof_pack.sh"

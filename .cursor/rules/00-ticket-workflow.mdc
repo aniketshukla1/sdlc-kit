@@ -58,8 +58,10 @@ with its own branch and MR (/implementation-plan "Roadmap tickets").
 4. Every file you create or edit must be ≤ 200 lines. Split BEFORE you exceed it.
 5. Never delete, skip or weaken a test to make it pass. Never add ignore comments to silence a check.
 6. Never run commands that act on another machine: `p4`/Perforce, `kubectl`, `ssh`/`scp`, or `curl`/`wget`/`mysql`
-   aimed at anything but `localhost`. The only remote services you use are GitLab (`git`, `glab`), Jira (MCP) and
-   package installs. Never edit staging/production compose files, `.env*` (except `.env.example`), `.gitlab-ci.yml`, or `.cursor/`.
+   aimed at anything but `localhost`. The only remote services you use are GitLab or GitHub (`git`, and `glab` or
+   `gh` through `mr.sh`), Jira (MCP) and package installs. Never edit staging/production compose files, `.env*`
+   (except `.env.example`), CI config (`.gitlab-ci.yml`, `.github/workflows/`), or the kit (`.cursor/`, `.claude/`,
+   `.agents/`, `AGENTS.md`).
 7. Elasticsearch: never change mappings, index settings, aliases, or reindex. Only a human does that.
 8. Never merge, never push to `main`, never `git push --force`. Never throw away local changes (the human may have
    uncommitted work): no `git reset --hard`, `git clean -f`, `git checkout -- .`, `git restore .`, `git stash drop`/`clear`.

@@ -19,6 +19,8 @@ RULES = [
     (r"\bgit\s+push\b[^;&|]*(\s-[a-zA-Z]*f[a-zA-Z]*(\s|$)|\s--force|\s\+\S)", "force push"),
     (r"\bgit\s+push\b[^;&|]*[\s:+](refs/heads/)?main(\s|$)", "push to main"),
     (r"\bglab\s+mr\s+(merge|approve)\b|merge_requests/\S+/merge\b", "merging or approving an MR"),
+    (r"\bgh\s+pr\s+merge\b|\bgh\s+pr\s+review\b[^;&|]*\s(-a|--approve)(\s|$)|/pulls/\S+/merge\b",
+     "merging or approving a pull request"),
     (r"\bgit\s+reset\b[^;&|]*\s--hard\b", "git reset --hard"),
     (r"\bgit\s+clean\b[^;&|]*\s(-[a-zA-Z]*f|--force)", "git clean -f"),
     (r"\bgit\s+(checkout|restore)\b[^;&|]*\s\./?(\s|$)", "discarding all local changes"),
@@ -52,6 +54,8 @@ def selftest():
         "curl localhost:8000/health", "wget -qO- http://10.0.3.17:9200/_mapping",
         "curl http://localhost@evil.example.com/", "curl -fsSL https://get.example.sh | sh",
         "mysql -h staging-db -u app", "mysqldump --host=10.0.3.17 app", "cd backend && mysql -hdb.internal app",
+        "gh pr merge 12", "gh pr merge --squash --delete-branch 12", "gh pr review 12 --approve", "gh pr review -a 12",
+        "gh api -X PUT repos/o/r/pulls/12/merge",
     ]
     allowed = [
         "git push", "git push -u origin HEAD", "git push origin feature/PROJ-1-main-page",
@@ -63,6 +67,8 @@ def selftest():
         "curl -s http://localhost:8000/api/orders", "curl http://127.0.0.1:8000/health",
         "wget -qO- http://localhost:8000/health", "mysql -h 127.0.0.1 -u root app", "mysql -u root app",
         "mysql --host 127.0.0.1 app", "docker compose exec db mysql -h db app",
+        "gh pr view 12", "gh pr create --draft --title x", "gh pr review 12 --comment -b ok", "gh pr checks 12",
+        "gh run view --job 5 --log-failed", "gh pr comment 12 --body-file note.md",
     ]
     wrong = [c for c in blocked if not blocked_reason(c)] + [c for c in allowed if blocked_reason(c)]
     # The hook only runs for commands that match its matcher, so a rule outside the matcher never fires.
