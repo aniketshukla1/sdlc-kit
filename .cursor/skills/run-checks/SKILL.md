@@ -30,4 +30,5 @@ description: Runs every automated check (file size, forbidden patterns, plan sco
 - `db_guard.sh`: refuses a DB whose host isn't in `LOCAL_DB_HOSTS` (used by the two above)
 - `check_api_types.sh`: the generated API types match the backend's OpenAPI schema (`--write` regenerates them); skipped until set up
 - `proof_pack.sh`: the MR's Proof section (verdict, red lines, changed files); refuses unless the last `ALL PASS` ran on exactly HEAD's content. Used by /gitlab-mr and /mr-feedback
-- `selftest.sh`: tests these scripts, the mr-feedback scripts and the Cursor command hook. For humans changing them; not part of run-checks
+- `selftest.sh`: tests these scripts, the mr-feedback scripts and the command hook. For humans changing them; not part of run-checks
+- `doctor.sh`: the setup checklist (tools, `glab`/`gh` login, the command hook, the self-tests). For humans; not part of run-checks

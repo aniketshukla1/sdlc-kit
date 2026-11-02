@@ -147,6 +147,41 @@ if [ -d "$KIT/.agents" ]; then
   bad=""; for d in "$KIT"/.cursor/skills/*/; do n="$(basename "$d")"; [ -f "$KIT/.agents/skills/$n/SKILL.md" ] || bad="$bad $n"; done
   ok=0; [ -z "$bad" ] && ok=1; verdict "every skill is linked for Codex" "$ok" "missing:$bad"
 fi
+
+# install.sh (kit only): copies without overwriting, merges hook settings, writes the settings it's given.
+if [ -f "$KIT/install.sh" ]; then
+  I="$(mktemp -d)"; for r in r1 r2 r3 r4 r5; do git init -q "$I/$r"; done
+  out="$(bash "$KIT/install.sh" "$I/r1" --no-check 2>&1)"; ok=0
+  [ -f "$I/r1/.cursor/rules/00-ticket-workflow.mdc" ] && [ -x "$I/r1/.cursor/skills/run-checks/scripts/check_all.sh" ] \
+    && [ -f "$I/r1/.agent/tracker.txt" ] && [ ! -e "$I/r1/.claude" ] && ok=1
+  verdict "install copies the kit for Cursor" "$ok" "$out"
+  mkdir -p "$I/r2/.claude"; printf '{"permissions": {"allow": ["Bash(ls)"]}}\n' > "$I/r2/.claude/settings.json"
+  out="$(bash "$KIT/install.sh" "$I/r2" --no-check 2>&1)"; ok=0
+  python3 -c 'import json, sys
+s = json.load(open(sys.argv[1]))
+assert s["permissions"]["allow"] == ["Bash(ls)"] and "block_commands.py" in json.dumps(s["hooks"]["PreToolUse"])' \
+    "$I/r2/.claude/settings.json" 2>/dev/null && [ -f "$I/r2/.claude/skills/gitlab-mr/SKILL.md" ] && ok=1
+  verdict "install adds Claude Code and merges its settings" "$ok" "$out"
+  mkdir -p "$I/r3/.agent" "$I/r3/.cursor/rules"; printf 'linear\n' > "$I/r3/.agent/tracker.txt"
+  printf 'ours\n' > "$I/r3/.cursor/rules/20-backend-standards.mdc"
+  out="$(bash "$KIT/install.sh" "$I/r3" --no-check 2>&1)"; ok=0
+  grep -qx linear "$I/r3/.agent/tracker.txt" && grep -qx ours "$I/r3/.cursor/rules/20-backend-standards.mdc" \
+    && [ -f "$I/r3/.cursor/rules/00-ticket-workflow.mdc" ] && ok=1
+  verdict "install keeps files that are already there" "$ok" "$out"
+  printf '# Our rules\n' > "$I/r4/AGENTS.md"
+  bash "$KIT/install.sh" "$I/r4" --no-check >/dev/null 2>&1; out="$(bash "$KIT/install.sh" "$I/r4" --no-check 2>&1)"; ok=0
+  grep -q '^# Our rules' "$I/r4/AGENTS.md" && [ "$(grep -c '^# sdlc-kit' "$I/r4/AGENTS.md")" -eq 1 ] \
+    && [ -f "$I/r4/.agents/skills/run-checks/SKILL.md" ] && ok=1
+  verdict "install appends to your AGENTS.md once" "$ok" "$out"
+  out="$(bash "$KIT/install.sh" "$I/r5" --tracker linear --key ENG --host github --no-check 2>&1)"; ok=0
+  grep -qx linear "$I/r5/.agent/tracker.txt" && grep -qx ENG "$I/r5/.agent/jira-project.txt" \
+    && grep -qx github "$I/r5/.agent/git-host.txt" && ok=1
+  verdict "install writes the tracker, key and host it's given" "$ok" "$out"
+  out="$(bash "$KIT/install.sh" "$I/missing" --no-check 2>&1)"; rc=$?; ok=0
+  [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q "not a git repository" && ok=1
+  verdict "install refuses a folder that isn't a git repository" "$ok" "$out"
+  rm -rf "$I"
+fi
 start; mkdir -p .claude; printf '{}\n' > .claude/settings.json
 expect "editing .claude/ needs human approval" FAIL "[protected path, needs human approval] .claude/settings.json"
 start; mkdir -p .agents/skills/x; printf 'x\n' > .agents/skills/x/SKILL.md
