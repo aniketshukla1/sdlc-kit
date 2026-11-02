@@ -129,6 +129,17 @@ if [ -f "$HOOK" ]; then
   ok=0; printf '%s' "$out" | grep -qF '"permissionDecision": "deny"' && ok=1; verdict "Claude Code hook denies over stdin" "$ok" "$out"
   out="$(printf '{"tool_name": "Bash", "tool_input": {"command": "git status"}}' | python3 "$HOOK" 2>&1)"
   ok=0; [ -z "$out" ] && ok=1; verdict "Claude Code hook stays silent on an allowed command" "$ok" "$out"
+  start; git switch -q main
+  out="$(printf '{"command": "git push"}' | python3 "$HOOK" 2>&1)"
+  ok=0; printf '%s' "$out" | grep -qF '"permission": "deny"' && ok=1; verdict "hook denies a bare git push while on main" "$ok" "$out"
+  out="$(printf '{"tool_name": "Bash", "tool_input": {"command": "git push -u origin HEAD"}, "cwd": "%s"}' "$(pwd -P)" \
+    | (cd / && python3 "$HOOK") 2>&1)"
+  ok=0; printf '%s' "$out" | grep -qF '"permissionDecision": "deny"' && ok=1; verdict "hook reads the branch from Claude Code's cwd" "$ok" "$out"
+  out="$(printf '{"command": "git -C %s push"}' "$(pwd -P)" | (cd / && python3 "$HOOK") 2>&1)"
+  ok=0; printf '%s' "$out" | grep -qF '"permission": "deny"' && ok=1; verdict "hook reads the branch of a git -C repo" "$ok" "$out"
+  start
+  out="$(printf '{"command": "git push -u origin HEAD"}' | python3 "$HOOK" 2>&1)"
+  ok=0; printf '%s' "$out" | grep -qF '"permission": "allow"' && ok=1; verdict "hook allows a push from a feature branch" "$ok" "$out"
 fi
 
 # Claude Code and Codex packaging links into .cursor/; checked wherever those folders were copied.
