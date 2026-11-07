@@ -55,4 +55,5 @@ else echo "  2. Add your Jira MCP server to your agent."; fi
 echo "  3. Open the repo in your agent, trust the workspace, and ask it to run: git push --force --dry-run"
 echo "     It must be blocked."
 echo "  4. Start a ticket: Start ticket PROJ-123. Follow the ticket workflow rule."
+echo "     No tracker, or no ticket yet? Skip step 2 and type /chat with what you want done."
 exit $bad

@@ -6,6 +6,7 @@ ROOT="$(git rev-parse --show-toplevel)"
 MB="${MB:-$(cd "$ROOT" && git merge-base "${BASE_REF:-origin/main}" HEAD 2>/dev/null)}" || { echo "Base ref not found. Set BASE_REF."; exit 1; }
 CHANGED="${CHANGED:-$(cd "$ROOT" && { git diff --name-only "$MB"; git ls-files --others --exclude-standard; })}"
 FILES=$(echo "$CHANGED" | grep -E '^frontend/.*\.(ts|tsx)$' | grep -v '^frontend/src/components/ui/' \
+  | grep -vxF "${API_TYPES:-frontend/src/api/schema.d.ts}" \
   | sed 's#^frontend/##' | while read -r f; do [ -f "$ROOT/frontend/$f" ] && echo "$f"; done)
 
 cd "$ROOT/frontend"

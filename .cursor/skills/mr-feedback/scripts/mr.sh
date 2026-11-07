@@ -7,7 +7,7 @@
 set -uo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)" || exit 1
-HOST="$(cat "$ROOT/.agent/git-host.txt" 2>/dev/null | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
+HOST="$(sed -n '/^[^#]/{p;q;}' "$ROOT/.agent/git-host.txt" 2>/dev/null | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
 [ -n "$HOST" ] || case "$(git remote get-url origin 2>/dev/null)" in *github*) HOST=github ;; *) HOST=gitlab ;; esac
 BASE="${BASE_REF:-origin/main}"; BASE="${BASE#origin/}"
 CMD="${1:-}"; [ $# -gt 0 ] && shift

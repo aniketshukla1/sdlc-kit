@@ -191,6 +191,8 @@ assert s["permissions"]["allow"] == ["Bash(ls)"] and "block_commands.py" in json
   grep -qx linear "$I/r5/.agent/tracker.txt" && grep -qx ENG "$I/r5/.agent/jira-project.txt" \
     && grep -qx github "$I/r5/.agent/git-host.txt" && ok=1
   verdict "install writes the tracker, key and host it's given" "$ok" "$out"
+  out="$(cd "$I/r5" && bash .cursor/skills/mr-feedback/scripts/mr.sh host 2>&1)"; ok=0; [ "$out" = github ] && ok=1
+  verdict "mr.sh reads the host the installer wrote" "$ok" "$out"
   out="$(bash "$KIT/install.sh" "$I/missing" --no-check 2>&1)"; rc=$?; ok=0
   [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -q "not a git repository" && ok=1
   verdict "install refuses a folder that isn't a git repository" "$ok" "$out"
@@ -401,6 +403,10 @@ start; printf '{"devDependencies": {"@vitest/coverage-v8": "3.0.0"}}\n' > fronte
 out="$(PATH="$F/npx_echo:$PATH" bash real_check_frontend.sh 2>&1)"; ok=0
 printf '%s' "$out" | grep -qF -- "--coverage.enabled" && printf '%s' "$out" | grep -qF -- "--coverage.include=src/**" && ok=1
 verdict "frontend check collects coverage when vitest coverage is there" "$ok" "$out"
+mkdir -p frontend/src/api; printf 'export {};\n' > frontend/src/api/schema.d.ts; printf 'export {};\n' > frontend/src/a.ts
+out="$(PATH="$F/npx_echo:$PATH" bash real_check_frontend.sh 2>&1)"; ok=0
+printf '%s' "$out" | grep -qF -- "src/a.ts" && ! printf '%s' "$out" | grep -qF -- "schema.d.ts" && ok=1
+verdict "frontend check leaves the generated API types out of eslint" "$ok" "$out"
 
 # Proof pack: check_all.sh records the tree it checked; proof_pack.sh vouches only for a HEAD with that tree.
 PP="$S/proof_pack.sh"
