@@ -20,9 +20,9 @@ Read code with line ranges. If the chat gets long: update PROGRESS.md, then say
 3. `git fetch origin && git switch -c <bugfix|feature|chore>/<KEY>-<short-slug> origin/main`
 4. Find the code: `rg -n "<error text, endpoint, field or component>" backend/app frontend/src`.
    Read only the functions involved.
-5. Bug: write ONE regression test that follows the steps and asserts the expected result. Copy the setup of
-   the nearest existing test. Run only that test: it must FAIL, showing the actual result.
-   It passes → it doesn't reproduce the bug: STOP and tell the human what you tried.
+5. Bug: write one regression test per symptom (usually just one) that follows the steps and asserts the expected
+   result. Copy the setup of the nearest existing test. Run only those tests: each must FAIL, showing the actual
+   result. One passes → it doesn't reproduce the bug: STOP and tell the human what you tried.
 6. Root cause: `file:line` and why. Find every caller of a function you'll change (`rg -n "<name>\("`) and
    fix it where they all meet, not in one caller. It worked before? First find the change that broke it:
    `git log -S '<code>' --oneline`.

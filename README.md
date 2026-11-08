@@ -14,7 +14,7 @@ It plans before it codes, writes failing tests first, and can't say "done" until
 ![Self-tests](https://img.shields.io/badge/self--tests-98%2F98%20passing-22c55e)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-60a5fa)](CONTRIBUTING.md)
 
-**[Website](https://aniketshukla1.github.io/sdlc-kit/)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
+**[Website](https://aniketshukla1.github.io/sdlc-kit/)** · **[A recorded run](https://github.com/aniketshukla1/sdlc-kit-example/blob/main/docs/RUN.md)** · [Quick start](#quick-start) · [How it works](#how-it-works) · [What's inside](#whats-inside) · [Guardrails](#guardrails) · [FAQ](#faq) · [Roadmap](#roadmap)
 
 <img src="docs/demo.gif" width="880" alt="21-second tour: an AI agent claims a ticket is done; sdlc-kit's tests start red and turn green, its check script catches a debug print on line 42, and its hook blocks a force push. It never merges. You do.">
 
@@ -220,7 +220,7 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 | Lint, types and the full test suite pass | `check_backend.sh`, `check_frontend.sh` |
 | Migrations reverse cleanly, one Alembic head, no drift from the models | `check_migration.sh` |
 | Frontend API types match the backend's OpenAPI schema (once set up) | `check_api_types.sh` |
-| At least 90% of the changed production lines run in the tests (the minimum is in `.agent/coverage.txt`; lowering it needs a human) | `check_coverage.sh`, once `pytest-cov` or `@vitest/coverage-v8` is installed |
+| At least 90% of the changed production lines run in the tests (the minimum is in `.agent/coverage.txt`; lowering it needs a human). JSX-only lines have no entry in v8's report, so the test-first rule covers them instead | `check_coverage.sh`, once `pytest-cov` or `@vitest/coverage-v8` is installed |
 | Tests and migrations only ever run against a local database | `db_guard.sh` (`LOCAL_DB_HOSTS`) |
 | Tests written before the code: red first, then green | `/write-tests` and the implement skills (red lines logged in `PROGRESS.md`, checked in `/self-review`) |
 | The MR carries its proof: `ALL PASS` on exactly the commit under review, the logged red lines, the changed files | `proof_pack.sh` (refuses if anything changed after the last check) |
@@ -232,6 +232,9 @@ Everything below is a script or a hook, except the two gates that stay human: ap
 
 The checks are what make the kit trustworthy, so they're tested too.
 
+- **[A recorded run](https://github.com/aniketshukla1/sdlc-kit-example/blob/main/docs/RUN.md)** on a sample repo: one
+  chat message to a merged PR, with the kit's real working files. It found 2 bugs the self-tests had missed, both now
+  fixed, and it says plainly what it doesn't show.
 - **98 self-tests** run the real scripts in throwaway git repos: deleted tests, weakened config, skipped tests,
   secrets, migrations edited on `main`, leftover stubs, swallowed errors, remote databases, force pushes and more.
   Every new case was first proven to fail against the old version of the script.
@@ -435,7 +438,7 @@ The workflow, the tracks, the hook and the guards are stack-agnostic. The standa
 
 Ideas on the table, not promises. Open an issue to vote or to pick one up.
 
-- [ ] An example repo with a recorded ticket → MR run
+- [x] [An example repo with a recorded ticket → MR run](https://github.com/aniketshukla1/sdlc-kit-example/blob/main/docs/RUN.md)
 - [x] GitHub support (`gh`, pull requests)
 - [x] Packaging for Claude Code and Codex (`.claude/`, `.agents/`, `AGENTS.md`)
 - [ ] A command guard for Codex (its experimental `.codex/rules`)

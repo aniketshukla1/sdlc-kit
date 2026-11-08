@@ -38,10 +38,10 @@ A migration-only task skips this skill: `check_migration.sh` is its test.
     PROGRESS.md and the MR.
 
 ## Bug tickets: the regression test (plan task T1)
-1. Write one test from REQUIREMENTS.md "Bug": follow the steps to reproduce, assert the Expected result.
-   Put it where the pattern source keeps tests of that kind.
-2. Run only that test. It must FAIL, showing the Actual result. Paste the failing output in PROGRESS.md.
-3. It passes? Then it doesn't reproduce the bug. STOP and tell the human what you tried.
+1. Write one test per symptom (usually just one) from REQUIREMENTS.md "Bug": follow the steps to reproduce, assert
+   the Expected result. Put it where the pattern source keeps tests of that kind.
+2. Run only those tests. Each must FAIL, showing the Actual result. Paste the failing output in PROGRESS.md.
+3. One passes? Then it doesn't reproduce the bug. STOP and tell the human what you tried.
 
 ## Done when
 - [ ] Every Test plan row of this task has a file and a logged red line
