@@ -339,6 +339,8 @@ If your GitLab has review apps, `/ticket-qa`'s Testing rows can run there before
 
 Same idea as the GitLab job: the guards come from the base branch's copy, so a pull request that edits
 `check_guards.sh` can't pass its own check. Save it as `.github/workflows/agent-guards.yml` once the kit is on `main`.
+The pull request that adds this file fails the guards, because workflows are a protected path: list it in
+`.agent/guard-exceptions.txt` for that pull request and remove the line after merging, or merge it knowing why it's red.
 
 ```yaml
 name: agent-guards
