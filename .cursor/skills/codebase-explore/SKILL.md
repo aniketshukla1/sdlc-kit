@@ -9,14 +9,14 @@ Read only. Do NOT edit code in this phase.
 ## Steps
 1. Read `.agent/work/<KEY>/REQUIREMENTS.md` and `PROGRESS.md`.
 2. Map the layout (names only, no file contents yet):
-   `ls backend/app backend/app/* frontend/src frontend/src/features 2>/dev/null`
+   `git ls-files backend/app frontend/src | cut -d/ -f1-4 | sort -u`
 3. For each key noun/verb in the requirements (e.g. "invoice", "cancel"):
    `rg -n -i "<term>" backend/app frontend/src --max-count 3` (no `rg`? use `git grep -n -i "<term>"`)
 4. Pick the PATTERN SOURCE: the existing feature most similar to this ticket (e.g. another
    list + detail + form). Read its route, schema, service, repository, model, api hook,
    main component and one test of each kind. These are the files you will copy patterns from.
 5. Check the test setup:
-   `ls backend/tests frontend/playwright.config.* frontend/cypress.config.* 2>/dev/null`
+   `git ls-files backend/tests | cut -d/ -f1-3 | sort -u; git ls-files frontend | grep -E '^frontend/(playwright|cypress)\.config\.'`
    For the screen this ticket touches, find its existing e2e spec: `rg -l -i "<screen name>" frontend/e2e frontend/cypress`
 6. Check if Elasticsearch is used: `ls backend/app/search 2>/dev/null`.
 7. Find existing error classes and auth dependencies:
